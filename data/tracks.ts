@@ -1,28 +1,4 @@
-export type BreathingForm =
-  | "insect"
-  | "mist"
-  | "flame"
-  | "sound"
-  | "stone"
-  | "serpent"
-  | "love"
-  | "wind"
-  | "water";
-
-export interface Track {
-  name: string;
-  form: BreathingForm;
-  formJp: string;
-  formEn: string;
-  /** Path under /public. */
-  img: string;
-  hashira: string;
-  style: string;
-  kanji: string;
-  /** SVG pattern id defined in components/tracks/PatternDefs.tsx. */
-  pat: string;
-  desc: string;
-}
+import type { Track } from "@/types/content";
 
 /** Verbatim content from the static build's data.js → tracks. */
 export const tracks: Track[] = [
@@ -32,7 +8,7 @@ export const tracks: Track[] = [
     formJp: "蟲の呼吸 · 蝶ノ舞「戯れ」",
     formEn: "Insect Breathing · Butterfly Dance: Caprice",
     img: "/assets/img/chars/shinobu.webp",
-    hashira: "Shinobu Kocho",
+    hashira: "Health",
     style: "Insect Breathing",
     kanji: "蟲",
     pat: "p-insect",
@@ -44,7 +20,7 @@ export const tracks: Track[] = [
     formJp: "霞の呼吸 · 壱ノ型「垂天遠霞」",
     formEn: "Mist Breathing · First Form: Low Clouds, Distant Haze",
     img: "/assets/img/chars/muichiro.webp",
-    hashira: "Muichiro Tokito",
+    hashira: "AR / VR",
     style: "Mist Breathing",
     kanji: "霞",
     pat: "p-mist",
@@ -56,7 +32,7 @@ export const tracks: Track[] = [
     formJp: "炎の呼吸 · 壱ノ型「不知火」",
     formEn: "Flame Breathing · First Form: Unknowing Fire",
     img: "/assets/img/chars/rengoku.webp",
-    hashira: "Kyojuro Rengoku",
+    hashira: "EduTech",
     style: "Flame Breathing",
     kanji: "炎",
     pat: "p-flame",
@@ -68,7 +44,7 @@ export const tracks: Track[] = [
     formJp: "音の呼吸 · 壱ノ型「轟」",
     formEn: "Sound Breathing · First Form: Roar",
     img: "/assets/img/chars/tengen.webp",
-    hashira: "Tengen Uzui",
+    hashira: "GameDev",
     style: "Sound Breathing",
     kanji: "音",
     pat: "p-sound",
@@ -80,7 +56,7 @@ export const tracks: Track[] = [
     formJp: "岩の呼吸 · 壱ノ型「蛇紋岩・双極」",
     formEn: "Stone Breathing · First Form: Serpentinite Bipolar",
     img: "/assets/img/chars/gyomei.webp",
-    hashira: "Gyomei Himejima",
+    hashira: "FinTech",
     style: "Stone Breathing",
     kanji: "岩",
     pat: "p-stone",
@@ -92,7 +68,7 @@ export const tracks: Track[] = [
     formJp: "蛇の呼吸 · 壱ノ型「委蛇斬り」",
     formEn: "Serpent Breathing · First Form: Winding Serpent Slash",
     img: "/assets/img/chars/obanai.webp",
-    hashira: "Obanai Iguro",
+    hashira: "CyberSec",
     style: "Serpent Breathing",
     kanji: "蛇",
     pat: "p-serpent",
@@ -104,7 +80,7 @@ export const tracks: Track[] = [
     formJp: "恋の呼吸 · 壱ノ型「初恋のわななき」",
     formEn: "Love Breathing · First Form: Shivers of First Love",
     img: "/assets/img/chars/mitsuri.webp",
-    hashira: "Mitsuri Kanroji",
+    hashira: "BlockChain",
     style: "Love Breathing",
     kanji: "恋",
     pat: "p-love",
@@ -116,7 +92,7 @@ export const tracks: Track[] = [
     formJp: "風の呼吸 · 壱ノ型「塵旋風・削ぎ」",
     formEn: "Wind Breathing · First Form: Dust Whirlwind Cutter",
     img: "/assets/img/chars/sanemi.webp",
-    hashira: "Sanemi Shinazugawa",
+    hashira: "Logistics",
     style: "Wind Breathing",
     kanji: "風",
     pat: "p-wind",
@@ -128,7 +104,7 @@ export const tracks: Track[] = [
     formJp: "水の呼吸 · 壱ノ型「水面斬り」",
     formEn: "Water Breathing · First Form: Water Surface Slash",
     img: "/assets/img/chars/giyu.webp",
-    hashira: "Giyu Tomioka",
+    hashira: "Defence",
     style: "Water Breathing",
     kanji: "水",
     pat: "p-hex",
@@ -136,4 +112,3 @@ export const tracks: Track[] = [
   },
 ];
 
-export const pad = (n: number) => String(n).padStart(2, "0");

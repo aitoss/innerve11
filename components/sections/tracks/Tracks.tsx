@@ -3,8 +3,10 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import PatternDefs from "@/components/tracks/PatternDefs";
-import { pad, tracks } from "@/lib/tracks";
+import { tracks } from "@/data/tracks";
+import { pad } from "@/lib/utils/format";
+import PatternDefs from "./PatternDefs";
+import "./tracks.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -121,3 +123,4 @@ export default function Tracks() {
     </div>
   );
 }
+

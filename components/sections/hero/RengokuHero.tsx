@@ -28,23 +28,26 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { INNERVE } from "@/lib/data";
-import { scramble } from "@/lib/scramble";
+import { EVENT } from "@/data/event";
+import { POOL_LACS } from "@/data/prizes";
+import { tracks } from "@/data/tracks";
+import { scramble } from "@/lib/utils/scramble";
 import Countdown from "./Countdown";
+import DevfolioButton from "./DevfolioButton";
+import "./hero.css";
 
 const WORD = "INNERVE".split("");
 const MID = (WORD.length - 1) / 2;
 
-
-/* event facts, all derived from lib/data.ts (or the site's existing copy) */
-const DATES = "30–31 Jan 2027";
-const START = `${INNERVE.eventStart.slice(11, 16)} IST`; // eventStart is +05:30
-const FACTS_L = `24 Hours · ${INNERVE.tracks.length} Tracks`;
-const FACTS_R = `₹${INNERVE.poolLacs}L+ Prize Pool`;
-const REG = INNERVE.timeline[0]; // { date: "15 Nov 2026", title: "Registration Starts" }
+/* event facts, all derived from data/ */
+const DATES = EVENT.dates;
+const START = `${EVENT.eventStart.slice(11, 16)} IST`; // eventStart is +05:30
+const FACTS_L = `24 Hours · ${tracks.length} Tracks`;
+const FACTS_R = `₹${POOL_LACS}L+ Prize Pool`;
+const REG = EVENT.timeline[0];
 
 /* crossed tapes: event facts on repeat, wiped in by scroll */
-const TAPE = ["Innerve 11", DATES, FACTS_L, FACTS_R, "OSS Club · AIT Pune"];
+const TAPE = [EVENT.name, DATES, FACTS_L, FACTS_R, EVENT.organiser];
 const TAPE_RUN = Array.from({ length: 6 }, () => TAPE).flat();
 
 /* hand-drawn scribbles (1440×900 artboard, sliced to cover) */
@@ -59,7 +62,9 @@ const SCRIBBLES = [
 const Scramble = ({ text }: { text: string }) => (
   <>
     <span className="sr-only">{text}</span>
-    <span aria-hidden="true" data-scramble={text} className="tabular-nums">{text}</span>
+    <span aria-hidden="true" data-scramble={text} className="tabular-nums">
+      {text}
+    </span>
   </>
 );
 
@@ -95,16 +100,25 @@ export default function RengokuHero() {
         .to(".re-veil", { opacity: 0, duration: 0.3, ease: "power1.out" }, 0)
         .set(".re-veil", { visibility: "hidden" }, 0.3)
         // scribbles draw themselves in behind the type (entrance only)
-        .fromTo(".re-scribble", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.4, ease: "power2.inOut", stagger: 0.08 }, 0)
+        .fromTo(
+          ".re-scribble",
+          { strokeDashoffset: 1 },
+          { strokeDashoffset: 0, duration: 1.4, ease: "power2.inOut", stagger: 0.08 },
+          0
+        )
         // red band rises from the bottom edge
         .from(".re-bandBg", { yPercent: 100, duration: 1, ease: "expo.out" }, 0.05)
         // headline: letters rise out of a mask, spread apart, then tighten into place
-        .from(".re-ch", {
-          yPercent: 110,
-          xPercent: (i: number) => (i - MID) * 34,
-          duration: 1.05,
-          stagger: { each: 0.035, from: "center" },
-        }, 0.08)
+        .from(
+          ".re-ch",
+          {
+            yPercent: 110,
+            xPercent: (i: number) => (i - MID) * 34,
+            duration: 1.05,
+            stagger: { each: 0.035, from: "center" },
+          },
+          0.08
+        )
         // Rengoku: bottom-up wipe (counter-translated mask) while he rises a touch
         .from(".re-art", { yPercent: 100, duration: 1.1, ease: "expo.inOut" }, 0.15)
         .from(".re-artIn", { yPercent: -100, duration: 1.1, ease: "expo.inOut" }, 0.15)
@@ -113,37 +127,32 @@ export default function RengokuHero() {
         .from(slides, { yPercent: 105, duration: 0.5, stagger: 0.05 }, 0.95)
         .from(band, { opacity: 0, y: 12, duration: 0.45, stagger: 0.08, ease: "power3.out" }, 1.1)
         .add(() => {
-          gsap.set([".re-bandBg", ".re-ch", ".re-art", ".re-artIn", ".re-lift", ...slides, ...band], { clearProps: "transform,opacity" });
+          gsap.set([".re-bandBg", ".re-ch", ".re-art", ".re-artIn", ".re-lift", ...slides, ...band], {
+            clearProps: "transform,opacity",
+          });
         });
       labels.forEach((l, i) => intro!.call(() => decode(l), [], 0.95 + i * 0.05));
 
       /* ================= 2. scroll: layered split, not a zoom ================= */
-      const scroll = { trigger: el, start: "top top", end: () => `+=${stage.offsetHeight}`, invalidateOnRefresh: true };
+      const scroll = {
+        trigger: el,
+        start: "top top",
+        end: () => `+=${stage.offsetHeight}`,
+        invalidateOnRefresh: true,
+      };
       gsap
         .timeline({ defaults: { ease: "none", duration: 1 }, scrollTrigger: { ...scroll, scrub: true } })
-        // every element on its own rate, so the poster separates into layers
-        // headline tears apart from its centre; each letter also lifts at its own speed
-        .to(".rz-head", { scale: 1.18 }, 0)
-        .to(".rz-ch", {
-          x: (i: number) => (i - MID) * window.innerWidth * 0.26,
-          y: (i: number) => [-30, 24, -54, 0, -40, 16, -22][i] ?? 0,
-        }, 0)
-        .to(".rz-ch", { opacity: (i: number) => (Math.abs(i - MID) < 1.5 ? 0 : 1), duration: 0.3 }, 0.6)
-        // under-labels peel off sideways, slower than the letters
-        .to(".rz-subL", { x: () => -window.innerWidth * 0.2, opacity: 0, duration: 0.7 }, 0)
-        .to(".rz-subR", { x: () => window.innerWidth * 0.2, opacity: 0, duration: 0.7 }, 0)
         // scribbles: each line drifts at a different speed
         .to(".rz-path", { y: (i: number) => [-90, -190, -130, -250][i] ?? -120 }, 0)
         // corners leave first, at two different speeds
         .to(".rz-cornerL", { y: -90, opacity: 0, duration: 0.3 }, 0)
         .to(".rz-cornerR", { y: -45, opacity: 0, duration: 0.45 }, 0)
-        // band description sinks away; the CTA stays put
-        .to(".rz-bandL", { y: 50, opacity: 0, duration: 0.5 }, 0.05)
         // he barely moves and settles into the band
         .to(".rz-art", { scale: 0.94, yPercent: 3 }, 0);
 
       /* ================= 3. crossed tapes: wipe in from opposite sides, text runs ================= */
-      gsap.timeline({ scrollTrigger: { ...scroll, scrub: 1 } })
+      gsap
+        .timeline({ scrollTrigger: { ...scroll, scrub: 1 } })
         .fromTo(".rz-tapeA", { xPercent: -101 }, { xPercent: 0, duration: 0.42, ease: "power3.out" }, 0.04)
         .fromTo(".rz-tapeB", { xPercent: 101 }, { xPercent: 0, duration: 0.42, ease: "power3.out" }, 0.12)
         .fromTo(".rz-runA", { xPercent: 0 }, { xPercent: -18, duration: 1, ease: "none" }, 0)
@@ -151,11 +160,16 @@ export default function RengokuHero() {
 
       /* ================= 4. curtain: hero dims under the rising panel ================= */
       if (next) {
-        gsap.timeline({ defaults: { ease: "none" }, scrollTrigger: { trigger: next, start: "top bottom", end: "top top", scrub: true } })
+        gsap
+          .timeline({
+            defaults: { ease: "none" },
+            scrollTrigger: { trigger: next, start: "top bottom", end: "top top", scrub: true },
+          })
           .to(".rc-shade", { opacity: 0.45 }, 0)
           // Rengoku rises slower than the panel, so its edge crosses him feet-first
           .to(".rc-art", { yPercent: -36 }, 0);
       }
+
       /* ================= 5. pointer depth (desktop only): each layer at its own depth ================= */
       if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
         const layers = gsap.utils.toArray<HTMLElement>("[data-depth]", el).map((n) => ({
@@ -166,7 +180,10 @@ export default function RengokuHero() {
         const onMove = (e: PointerEvent) => {
           const nx = e.clientX / window.innerWidth - 0.5;
           const ny = e.clientY / window.innerHeight - 0.5;
-          layers.forEach((l) => { l.x(nx * l.d); l.y(ny * l.d * 0.6); });
+          layers.forEach((l) => {
+            l.x(nx * l.d);
+            l.y(ny * l.d * 0.6);
+          });
         };
         stage.addEventListener("pointermove", onMove);
         cancels.push(() => stage.removeEventListener("pointermove", onMove));
@@ -174,7 +191,9 @@ export default function RengokuHero() {
     }, el);
 
     // stalled first frame? settle the entrance only, never the scrubbed timelines
-    const watchdog = window.setTimeout(() => { if (intro && intro.progress() < 1) intro.progress(1); }, 4000);
+    const watchdog = window.setTimeout(() => {
+      if (intro && intro.progress() < 1) intro.progress(1);
+    }, 4000);
 
     return () => {
       window.clearTimeout(watchdog);
@@ -184,14 +203,35 @@ export default function RengokuHero() {
   }, []);
 
   return (
-    <section ref={root} id="arrival" data-tone="light" data-name="Arrival" className="flame relative h-[300svh] bg-haori text-coat">
+    <section
+      ref={root}
+      id="arrival"
+      data-tone="light"
+      data-name="Arrival"
+      className="flame relative h-[300svh] bg-haori text-coat"
+    >
       <div className="flame__stage sticky top-0 h-svh overflow-hidden">
         {/* ---------- scribbles ---------- */}
         <div className="rz-scribbles pointer-events-none absolute inset-0 z-[1]" aria-hidden="true">
           <div className="h-full w-full" data-depth="10">
-            <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" className="rf-scribbles h-full w-full overflow-visible" fill="none">
+            <svg
+              viewBox="0 0 1440 900"
+              preserveAspectRatio="xMidYMid slice"
+              className="rf-scribbles h-full w-full overflow-visible"
+              fill="none"
+            >
               {SCRIBBLES.map((d, i) => (
-                <path key={i} d={d} pathLength={1} strokeDasharray="1" className="rz-path re-scribble" stroke="#ea6a1c" strokeWidth="1.6" strokeLinecap="round" strokeOpacity=".6" />
+                <path
+                  key={i}
+                  d={d}
+                  pathLength={1}
+                  strokeDasharray="1"
+                  className="rz-path re-scribble"
+                  stroke="#ea6a1c"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeOpacity=".6"
+                />
               ))}
             </svg>
           </div>
@@ -219,9 +259,20 @@ export default function RengokuHero() {
               </span>
             </h1>
             <div className="rz-sub re-label mt-[clamp(6px,1.2svh,14px)] flex items-start justify-between px-[0.4%] text-[clamp(12px,1.15vw,17px)] text-crimson">
-              <span className="rz-subL block"><Slide className="font-semibold uppercase tracking-[0.08em]">{FACTS_L}</Slide></span>
-              <span className="rz-subR block"><Slide className="font-semibold uppercase tracking-[0.08em]">{FACTS_R}</Slide></span>
+              <span className="rz-subL block">
+                <Slide className="font-semibold uppercase tracking-[0.08em]">{FACTS_L}</Slide>
+              </span>
+              <span className="rz-subR block">
+                <Slide className="font-semibold uppercase tracking-[0.08em]">{FACTS_R}</Slide>
+              </span>
             </div>
+          </div>
+        </div>
+
+        {/* ---------- Devfolio apply CTA below headline ---------- */}
+        <div className="flame-ctaPos pointer-events-none absolute inset-x-0 z-[6] flex justify-center">
+          <div className="pointer-events-auto" data-depth="14">
+            <DevfolioButton />
           </div>
         </div>
 
@@ -255,31 +306,33 @@ export default function RengokuHero() {
         {/* ---------- Rengoku, straddling the band (overlays go inside .rf-art) ---------- */}
         <div className="flame-figPos pointer-events-none absolute left-1/2 z-[5] -translate-x-1/2" aria-hidden="true">
           <div data-depth="-16">
-          <div className="rc-art">
-            <div className="rz-art origin-bottom">
-              <div className="re-lift">
-                <div className="re-art overflow-hidden">
-                  <div className="re-artIn">
-                    <div className="rf-art relative">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/assets/img/chars/rengoku.png" width={750} height={1186} alt="" fetchPriority="high" className="flame-fig block w-auto max-w-none" />
+            <div className="rc-art">
+              <div className="rz-art origin-bottom">
+                <div className="re-lift">
+                  <div className="re-art overflow-hidden">
+                    <div className="re-artIn">
+                      <div className="rf-art relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src="/assets/img/chars/rengoku.png"
+                          width={750}
+                          height={1186}
+                          alt=""
+                          fetchPriority="high"
+                          className="flame-fig block w-auto max-w-none"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          </div>
         </div>
 
         {/* ---------- band copy + CTA (above every animated layer) ---------- */}
         <div className="flame-band flame-bandCopy absolute inset-x-0 bottom-0 z-[6] flex px-gut text-haori lg:justify-between lg:gap-8">
-          <div className="rz-bandL re-band max-w-[30ch]">
-            <span className="mb-3 flex gap-1.5 max-lg:hidden" aria-hidden="true">
-              <i className="rf-dot h-1.5 w-1.5 rounded-full bg-ember" style={{ animationDelay: "0.0s" }} />
-              <i className="rf-dot h-1.5 w-1.5 rounded-full bg-flame" style={{ animationDelay: "0.25s" }} />
-              <i className="rf-dot h-1.5 w-1.5 rounded-full bg-crimson" style={{ animationDelay: "0.5s" }} />
-            </span>
+          <div className="rz-bandL re-band max-w-[30ch] text-left">
             <p className="text-[clamp(13px,1vw,15px)] leading-[1.55] text-haori/80">
               India&apos;s largest student-driven hackathon. Twenty-four hours inside the Infinity Castle.
             </p>
@@ -290,7 +343,9 @@ export default function RengokuHero() {
               {REG.title} · {REG.date}
             </span>
             <span className="mt-1 flex items-center gap-3 font-body text-[clamp(28px,3.1vw,50px)] font-extrabold uppercase leading-[1] tracking-[-0.02em] text-ember lg:justify-end">
-              <span className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_2px] bg-left-bottom bg-no-repeat pb-1 transition-[background-size] duration-500 group-hover:bg-[length:100%_2px]">Enter the castle</span>
+              <span className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_2px] bg-left-bottom bg-no-repeat pb-1 transition-[background-size] duration-500 group-hover:bg-[length:100%_2px]">
+                Enter the castle
+              </span>
             </span>
           </a>
         </div>
@@ -298,12 +353,16 @@ export default function RengokuHero() {
         {/* ---------- corner metadata ---------- */}
         <div className="rz-labels pointer-events-none absolute inset-x-gut top-[clamp(18px,3svh,30px)] z-[7] flex items-start justify-between text-[clamp(10.5px,0.85vw,12.5px)] font-semibold uppercase leading-[1.5] tracking-[0.14em] text-crimson">
           <div className="rz-cornerL re-label">
-            <Slide><Scramble text={DATES} /></Slide>
-            <Slide><Scramble text={START} /></Slide>
+            <Slide>
+              <Scramble text={DATES} />
+            </Slide>
+            <Slide>
+              <Scramble text={START} />
+            </Slide>
           </div>
           <div className="rz-cornerR re-label text-right">
-            <Slide>Innerve 11</Slide>
-            <Slide>OSS Club · AIT Pune</Slide>
+            <Slide>{EVENT.name}</Slide>
+            <Slide>{EVENT.organiser}</Slide>
           </div>
         </div>
 
@@ -313,3 +372,4 @@ export default function RengokuHero() {
     </section>
   );
 }
+

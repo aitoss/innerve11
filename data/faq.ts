@@ -1,11 +1,8 @@
+import type { FaqItem } from "@/types/content";
+
 export const faqCategories = ["General", "Registration", "Stay & Travel"] as const;
 
 export type FaqCategory = (typeof faqCategories)[number];
-
-export interface FaqItem {
-  q: string;
-  a: string;
-}
 
 /** Verbatim content from the static build's data.js → faq. */
 export const faq: Record<FaqCategory, FaqItem[]> = {
@@ -64,3 +61,4 @@ export const faq: Record<FaqCategory, FaqItem[]> = {
     },
   ],
 };
+

@@ -1,0 +1,66 @@
+.pcards {
+  perspective: 1200px;
+}
+
+.pcard-wrap {
+  will-change: transform, opacity;
+}
+
+.pcard {
+  position: relative;
+  display: flex;
+  height: 100%;
+  min-height: 300px;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 28px 28px 26px 84px;
+  transform-origin: center center;
+  transform: perspective(900px) rotateX(0deg);
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease,
+    box-shadow 0.45s ease;
+}
+
+/* Angled 3D resting shape on pointer devices; straightens on hover and returns on leave */
+@media (hover: hover) and (pointer: fine) {
+  .pcard {
+    transform: perspective(900px) rotateX(-10deg);
+  }
+
+  .pcard-wrap:hover .pcard {
+    transform: perspective(900px) rotateX(0deg) translateY(-4px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.42);
+  }
+}
+
+/* Diagonal light sheen on hover */
+.pcard::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  transform: skewX(-20deg);
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  transition: left 0.7s ease;
+  pointer-events: none;
+}
+
+.pcard-wrap:hover .pcard::after {
+  left: 130%;
+}
+
+@media (max-width: 640px) {
+  .pcard {
+    min-height: 240px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pcard {
+    transform: none;
+  }
+}
+

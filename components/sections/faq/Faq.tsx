@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { faq, faqCategories } from "@/lib/faq";
+import { faq, faqCategories } from "@/data/faq";
+import "./faq.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -103,3 +104,4 @@ export default function Faq() {
     </div>
   );
 }
+

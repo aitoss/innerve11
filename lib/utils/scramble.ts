@@ -6,7 +6,10 @@
 
 const GLYPHS = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#%&*+/<>";
 
-export function scramble(el: HTMLElement, { first = 0.6, last = 0.9, tick = 0.045 } = {}): () => void {
+export function scramble(
+  el: HTMLElement,
+  { first = 0.6, last = 0.9, tick = 0.045 } = {}
+): () => void {
   const final = el.dataset.scramble ?? el.textContent ?? "";
   const chars = [...final];
   const n = chars.length;
@@ -52,3 +55,4 @@ export function scramble(el: HTMLElement, { first = 0.6, last = 0.9, tick = 0.04
     finish();
   };
 }
+
