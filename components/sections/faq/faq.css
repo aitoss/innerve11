@@ -47,12 +47,14 @@
   font-weight: 600;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
   margin-bottom: 20px;
   opacity: 0.8;
 }
 
-.ivf .eyebrow::before {
+.ivf .eyebrow::before,
+.ivf .eyebrow::after {
   content: "";
   width: 28px;
   height: 2px;
@@ -67,6 +69,7 @@
   line-height: 0.9;
   letter-spacing: -0.01em;
   white-space: nowrap;
+  text-align: center;
 }
 
 /* ===== FAQ ===== */
@@ -83,6 +86,7 @@
 
 .ivf .faq__tabs {
   display: flex;
+  justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
   margin: clamp(28px, 4vw, 48px) 0 24px;
@@ -109,6 +113,7 @@
 .ivf .faq__list {
   border-top: 2px solid var(--paper);
   max-width: 980px;
+  margin: 0 auto;
 }
 
 .ivf .qa {
