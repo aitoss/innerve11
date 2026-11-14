@@ -6,7 +6,7 @@
   --fig: min(50svh, 38vw);
   --figBottom: 1.5svh;
   --headTop: 9%;
-  --ctaTop: 38%;
+  --ctaTop: 34%;
 }
 @media (max-width: 1023px) {
   .flame__stage {

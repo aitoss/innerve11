@@ -25,13 +25,14 @@
    prefers-reduced-motion: no timelines, no tapes, no scramble; the settled
    poster renders as-is. */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { EVENT } from "@/data/event";
 import { POOL_LACS } from "@/data/prizes";
 import { tracks } from "@/data/tracks";
 import { scramble } from "@/lib/utils/scramble";
+import MenuModal from "@/components/sections/menu/MenuModal";
 import Countdown from "./Countdown";
 import DevfolioButton from "./DevfolioButton";
 import "./hero.css";
@@ -77,6 +78,7 @@ const Slide = ({ children, className = "" }: { children: React.ReactNode; classN
 
 export default function RengokuHero() {
   const root = useRef<HTMLElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const el = root.current;
@@ -360,15 +362,36 @@ export default function RengokuHero() {
               <Scramble text={START} />
             </Slide>
           </div>
-          <div className="rz-cornerR re-label text-right">
-            <Slide>{EVENT.name}</Slide>
-            <Slide>{EVENT.organiser}</Slide>
+          <div className="rz-cornerR re-label flex items-center gap-4 text-right">
+            <div>
+              <Slide>{EVENT.name}</Slide>
+              <Slide>{EVENT.organiser}</Slide>
+            </div>
+            <Slide>
+              <button
+                type="button"
+                onClick={() => setMenuOpen(true)}
+                aria-label="Open navigation menu"
+                className="pointer-events-auto group relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg transition-transform duration-200 hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B9172E]"
+              >
+                <div
+                  className="h-10 w-10 bg-[#B9172E] transition-opacity duration-200 group-hover:opacity-80 [mask:url('/assets/svg/hamburger.svg')_no-repeat_center/contain] [-webkit-mask:url('/assets/svg/hamburger.svg')_no-repeat_center/contain]"
+                />
+              </button>
+            </Slide>
           </div>
         </div>
 
         {/* paints the poster ivory until the entrance starts (no flash of the settled state) */}
         <div className="re-veil r-veil pointer-events-none absolute inset-0 z-[20] bg-haori" aria-hidden="true" />
       </div>
+
+      {/* Full-screen CRED-style Menu Modal */}
+      <MenuModal
+        isOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        brochureUrl="https://drive.google.com/file/d/1kcBuw6igb2xDGS1xgk9HivU-EvKXRS6D/view"
+      />
     </section>
   );
 }
