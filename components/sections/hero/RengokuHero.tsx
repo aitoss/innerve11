@@ -19,8 +19,8 @@
    Anything laid over the character art goes inside .rf-art next to the <img>
    so it inherits every transform and stays pixel-locked to Rengoku.
 
-   The stage is CSS-sticky in a 300svh track: 100svh of scroll choreography,
-   then #tracks (pulled up 100svh) rises over the stuck stage.
+   The stage is CSS-sticky in a 200svh track: 100svh of scroll choreography,
+   then #tracks rises over the stuck stage.
 
    prefers-reduced-motion: no timelines, no tapes, no scramble; the settled
    poster renders as-is. */
@@ -210,7 +210,7 @@ export default function RengokuHero() {
       id="arrival"
       data-tone="light"
       data-name="Arrival"
-      className="flame relative h-[300svh] bg-haori text-coat"
+      className="flame relative h-[200svh] bg-haori text-coat"
     >
       <div className="flame__stage sticky top-0 h-svh overflow-hidden">
         {/* ---------- scribbles ---------- */}
