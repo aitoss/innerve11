@@ -10,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function Faq() {
   const [active, setActive] = useState(0);
-  const [open, setOpen] = useState<Set<number>>(() => new Set());
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const firstRender = useRef(true);
 
@@ -37,17 +37,11 @@ export default function Faq() {
 
   const selectCategory = (index: number) => {
     setActive(index);
-    setOpen(new Set());
+    setOpenIndex(null);
   };
 
   const toggleQuestion = (index: number) => {
-    setOpen((current) => {
-      const next = new Set(current);
-      if (next.has(index)) next.delete(index);
-      else next.add(index);
-      return next;
-    });
-
+    setOpenIndex((current) => (current === index ? null : index));
     window.setTimeout(() => ScrollTrigger.refresh(), 500);
   };
 
@@ -79,7 +73,7 @@ export default function Faq() {
 
           <div className="faq__list" ref={listRef}>
             {faq[category].map((item, index) => {
-              const isOpen = open.has(index);
+              const isOpen = openIndex === index;
               return (
                 <div key={item.q} className={`qa${isOpen ? " open" : ""}`}>
                   <button

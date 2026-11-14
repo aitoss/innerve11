@@ -118,12 +118,6 @@
 
 .ivf .qa {
   border-bottom: 1px solid rgba(239, 232, 220, 0.18);
-  border-left: 2px solid transparent;
-  transition: border-color 0.35s;
-}
-
-.ivf .qa.open {
-  border-left-color: var(--red);
 }
 
 .ivf .qa button {
