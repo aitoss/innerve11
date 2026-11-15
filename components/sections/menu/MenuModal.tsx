@@ -333,7 +333,7 @@ export default function MenuModal({
               Select Destination
             </div>
 
-            <nav aria-label="Sections" className="flex flex-col space-y-[clamp(4px,0.8svh,6px)]">
+            <nav aria-label="Sections" className="flex flex-col space-y-[clamp(3px,0.6svh,6px)]">
               {MENU_SECTIONS.map((section, idx) => {
                 const isSelected = !isBrochureHovered && idx === (hoveredIndex !== null ? hoveredIndex : activeIndex);
                 return (
@@ -351,7 +351,7 @@ export default function MenuModal({
                       setIsBrochureHovered(false);
                       setActiveIndex(idx);
                     }}
-                    className={`group relative flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-[clamp(8px,1.2svh,12px)] text-left transition-all duration-200 focus:outline-none ${
+                    className={`group relative flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-[clamp(5px,0.9svh,12px)] text-left transition-all duration-200 focus:outline-none ${
                       isSelected
                         ? "bg-white/85 border border-crimson/40 shadow-[0_6px_28px_rgba(185,23,46,0.15)] translate-x-1 sm:translate-x-2"
                         : "border border-coat/10 bg-coat/[0.03] hover:bg-coat/[0.07] hover:border-coat/20 hover:translate-x-1"
@@ -377,7 +377,7 @@ export default function MenuModal({
 
                       <div className="flex flex-col">
                         <span
-                          className={`font-display text-2xl sm:text-3xl lg:text-[clamp(26px,4.2svh,36px)] lg:leading-[1.1] uppercase tracking-tight transition-colors duration-200 ${
+                          className={`font-display text-2xl sm:text-3xl lg:text-[clamp(22px,3.6svh,36px)] lg:leading-[1.1] uppercase tracking-tight transition-colors duration-200 ${
                             isSelected
                               ? "text-crimson drop-shadow-[0_2px_8px_rgba(185,23,46,0.12)]"
                               : "text-coat group-hover:text-crimson"
@@ -430,7 +430,7 @@ export default function MenuModal({
               })}
 
               
-              {/* <div className="pt-2">
+              <div className="pt-[clamp(2px,0.8svh,8px)]">
                 <a
                   href={brochureUrl}
                   target="_blank"
@@ -439,7 +439,7 @@ export default function MenuModal({
                   onMouseLeave={() => setIsBrochureHovered(false)}
                   onFocus={() => setIsBrochureHovered(true)}
                   onBlur={() => setIsBrochureHovered(false)}
-                  className={`group relative flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-3 text-left transition-all duration-200 focus:outline-none ${
+                  className={`group relative flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-[clamp(5px,0.9svh,12px)] text-left transition-all duration-200 focus:outline-none ${
                     isBrochureHovered
                       ? "bg-white border-2 border-crimson shadow-[0_8px_30px_rgba(185,23,46,0.22)] translate-x-1 sm:translate-x-2"
                       : "border-2 border-crimson/35 bg-gradient-to-r from-crimson/[0.08] via-flame/[0.05] to-amber/[0.08] hover:border-crimson hover:bg-white hover:translate-x-1 shadow-[0_4px_16px_rgba(185,23,46,0.1)]"
@@ -475,7 +475,7 @@ export default function MenuModal({
 
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                        <span className="font-display text-2xl sm:text-3xl uppercase tracking-tight text-crimson group-hover:text-red transition-colors">
+                        <span className="font-display text-2xl sm:text-3xl lg:text-[clamp(22px,3.6svh,30px)] lg:leading-[1.1] uppercase tracking-tight text-crimson group-hover:text-red transition-colors">
                           BROCHURE
                         </span>
                         <span className="rounded bg-crimson px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-sm">
@@ -509,7 +509,7 @@ export default function MenuModal({
                     </svg>
                   </div>
                 </a>
-              </div> */}
+              </div>
             </nav>
           </div>
 

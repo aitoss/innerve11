@@ -33,14 +33,13 @@ export default function Sponsors() {
               <span className="atile__tier absolute left-[14px] top-3 text-[10px] font-semibold uppercase tracking-[0.22em] opacity-60 group-hover:text-paper group-hover:opacity-90">
                 {s.tier}
               </span>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={`assets/logos/sponsors/${s.logo}`}
                 alt={s.alt ?? s.name}
                 loading="lazy"
                 className={`max-w-[76%] object-contain transition-[transform,background,padding] duration-[400ms] group-hover:scale-[1.06] ${
                   s.size === "xl"
-                    ? "max-h-[110px] bg-paper px-6 py-[18px]"
+                    ? "max-h-[110px] group-hover:bg-paper group-hover:px-6 group-hover:py-[18px]"
                     : "max-h-[54px] group-hover:bg-paper group-hover:px-4 group-hover:py-2.5"
                 }`}
               />
