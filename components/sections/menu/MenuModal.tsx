@@ -333,7 +333,7 @@ export default function MenuModal({
               Select Destination
             </div>
 
-            <nav aria-label="Sections" className="flex flex-col space-y-1.5">
+            <nav aria-label="Sections" className="flex flex-col space-y-[clamp(4px,0.8svh,6px)]">
               {MENU_SECTIONS.map((section, idx) => {
                 const isSelected = !isBrochureHovered && idx === (hoveredIndex !== null ? hoveredIndex : activeIndex);
                 return (
@@ -351,7 +351,7 @@ export default function MenuModal({
                       setIsBrochureHovered(false);
                       setActiveIndex(idx);
                     }}
-                    className={`group relative flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-2.5 sm:py-3 text-left transition-all duration-200 focus:outline-none ${
+                    className={`group relative flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-[clamp(8px,1.2svh,12px)] text-left transition-all duration-200 focus:outline-none ${
                       isSelected
                         ? "bg-white/85 border border-crimson/40 shadow-[0_6px_28px_rgba(185,23,46,0.15)] translate-x-1 sm:translate-x-2"
                         : "border border-coat/10 bg-coat/[0.03] hover:bg-coat/[0.07] hover:border-coat/20 hover:translate-x-1"
@@ -377,7 +377,7 @@ export default function MenuModal({
 
                       <div className="flex flex-col">
                         <span
-                          className={`font-display text-2xl sm:text-3xl lg:text-4xl uppercase tracking-tight transition-colors duration-200 ${
+                          className={`font-display text-2xl sm:text-3xl lg:text-[clamp(26px,4.2svh,36px)] lg:leading-[1.1] uppercase tracking-tight transition-colors duration-200 ${
                             isSelected
                               ? "text-crimson drop-shadow-[0_2px_8px_rgba(185,23,46,0.12)]"
                               : "text-coat group-hover:text-crimson"
@@ -429,8 +429,8 @@ export default function MenuModal({
                 );
               })}
 
-              {/* Distinctive Brochure / Browser PDF Button at the bottom */}
-              <div className="pt-2">
+              
+              {/* <div className="pt-2">
                 <a
                   href={brochureUrl}
                   target="_blank"
@@ -445,7 +445,7 @@ export default function MenuModal({
                       : "border-2 border-crimson/35 bg-gradient-to-r from-crimson/[0.08] via-flame/[0.05] to-amber/[0.08] hover:border-crimson hover:bg-white hover:translate-x-1 shadow-[0_4px_16px_rgba(185,23,46,0.1)]"
                   }`}
                 >
-                  {/* Active flame indicator bar */}
+                 
                   <div
                     className={`absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1.5 rounded-r-full bg-gradient-to-b from-crimson to-flame transition-all duration-300 ${
                       isBrochureHovered ? "opacity-100 scale-y-100" : "opacity-0 scale-y-0"
@@ -453,7 +453,7 @@ export default function MenuModal({
                     aria-hidden="true"
                   />
 
-                  {/* Left details */}
+                  
                   <div className="flex items-center gap-3 sm:gap-4 pl-1">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-crimson/15 text-crimson transition-colors duration-200 group-hover:bg-crimson group-hover:text-white">
                       <svg
@@ -488,7 +488,7 @@ export default function MenuModal({
                     </div>
                   </div>
 
-                  {/* Right side external link arrow */}
+                 
                   <div className="flex items-center gap-2 pr-1">
                     <span className="hidden sm:inline-block font-mono text-[10px] font-bold uppercase tracking-wider text-crimson/80">
                       View
@@ -509,22 +509,22 @@ export default function MenuModal({
                     </svg>
                   </div>
                 </a>
-              </div>
+              </div> */}
             </nav>
           </div>
 
-          {/* ----- RIGHT: SECTION PREVIEW (DESKTOP VIEW ONLY) ----- */}
+         
           <div className="hidden lg:flex lg:col-span-7 xl:col-span-7 flex-col justify-center">
             <div className="relative overflow-hidden rounded-2xl border border-coat/15 bg-white/90 p-8 shadow-[0_20px_50px_rgba(42,27,22,0.1)] backdrop-blur-xl transition-all duration-500 min-h-[460px] flex items-center">
               
-              {/* Dynamic ambient card glow matching section's flame tone */}
+             
               <div
                 className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full blur-[100px] opacity-25 transition-all duration-700"
                 style={{ backgroundColor: activeSection.glowColor }}
                 aria-hidden="true"
               />
 
-              {/* Massive background Kanji Watermark */}
+              
               <div
                 className="pointer-events-none absolute -right-4 -bottom-10 select-none font-kanji text-[15rem] font-black text-coat/[0.04] leading-none"
                 aria-hidden="true"
@@ -532,12 +532,12 @@ export default function MenuModal({
                 {activeSection.kanji}
               </div>
 
-              {/* Inner Preview Content: Two Columns (Copy on Left, Character on Right) */}
+             
               <div className="relative z-10 grid w-full grid-cols-12 items-center gap-6">
                 
-                {/* Left side info */}
+                
                 <div className="col-span-7 flex flex-col space-y-4">
-                  {/* Tag and Index */}
+                 
                   <div className="flex items-center gap-2">
                     <span className="rounded-full border border-coat/15 bg-coat/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-coat/80">
                       {activeSection.tag}
@@ -547,7 +547,7 @@ export default function MenuModal({
                     </span>
                   </div>
 
-                  {/* Section Title & Japanese Subtitle */}
+                  
                   <div>
                     <h2 className="font-display text-4xl xl:text-5xl uppercase tracking-tight text-coat">
                       {activeSection.title}
@@ -557,12 +557,12 @@ export default function MenuModal({
                     </p>
                   </div>
 
-                  {/* Description */}
+                
                   <p className="text-sm xl:text-base leading-relaxed text-coat/80">
                     {activeSection.desc}
                   </p>
 
-                  {/* Highlights Pills */}
+                 
                   <div className="flex flex-wrap gap-2 pt-1">
                     {activeSection.highlights.map((item, i) => (
                       <span
@@ -574,7 +574,7 @@ export default function MenuModal({
                     ))}
                   </div>
 
-                  {/* Action Button: Jump to section OR Open PDF */}
+                  
                   <div className="pt-2">
                     {activeSection.isExternalPdf ? (
                       <a
