@@ -30,7 +30,7 @@ export default function DevfolioButton() {
     window.open('https://unstop.com/o/PvyFs2j?lb=7ZSlAfI&utm_medium=Share&utm_source=WhatsApp', '_blank');
   }
   return (
-    <button onClick={handleClick} className="flex text-stroke-h4 justify-center items-center text-[18px] sm:text-[20px] md:text-[22px] lg:text-[32px] w-fit py-2 px-12 bg-blue-500 rounded-2xl text-white font-sans font-semibold ">
+    <button onClick={handleClick} className="flex text-stroke-h4 justify-center items-center text-[16px] sm:text-[20px] md:text-[22px] lg:text-[32px] w-fit py-2 px-6 sm:px-12 bg-blue-500 rounded-2xl text-white font-sans font-semibold ">
       Apply With Unstop
     </button>
   );

@@ -13,12 +13,12 @@ export default function Testimonials() {
           <span className="h-0.5 w-7 bg-red" aria-hidden="true" />
           Testimonials
         </div>
-        <h2 className="sec-title font-display uppercase leading-[0.9] tracking-[-0.01em] text-[clamp(48px,9vw,150px)]">
+        <h2 className="sec-title font-display uppercase leading-[0.9] tracking-[-0.01em] text-[clamp(48px,9vw,150px)] max-[430px]:text-[clamp(36px,11vw,56px)]">
           Words from the <em>survivors.</em>
         </h2>
         <div id="vgrid" className="vgrid mt-[clamp(32px,5vw,60px)] grid grid-cols-3 gap-5 max-[960px]:grid-cols-1">
           {TESTIMONIALS.map((t) => (
-            <figure key={t.name} className="vcard relative flex flex-col border border-ink/15 bg-card p-[34px_28px_28px]">
+            <figure key={t.name} className="vcard relative flex flex-col border border-ink/15 bg-card p-[34px_28px_28px] max-[430px]:p-[24px_18px_18px]">
               <span aria-hidden="true" className="h-[44px] font-display text-[110px] leading-[0.6] text-red">
                 &ldquo;
               </span>

@@ -330,10 +330,52 @@
   }
 }
 
+/* ---- phones: 320px – 430px ---- */
+@media (max-width: 430px) {
+  .ivt .sec-title {
+    font-size: clamp(40px, 12vw, 56px);
+  }
+
+  /* slightly narrower number col to give the title room */
+  .ivt .trow__in {
+    grid-template-columns: 36px 1fr;
+    gap: 10px;
+    padding: 16px var(--gut);
+  }
+
+  .ivt .trow__num {
+    font-size: 20px;
+  }
+
+  .ivt .trow__name {
+    font-size: clamp(28px, 9vw, 48px);
+  }
+
+  .ivt .trow__meta {
+    font-size: clamp(13px, 3.8vw, 16px);
+  }
+
+  /* artwork panel narrower so it doesn't swamp the small text area */
+  .ivt .trow__art {
+    width: 50%;
+    opacity: 0.4;
+  }
+
+  /* hashira name slightly smaller on phones */
+  .ivt .trow__hname {
+    font-size: clamp(24px, 8vw, 40px);
+  }
+}
+
 /* keep "breathing style." on one line on very narrow phones */
 @media (max-width: 360px) {
   .ivt .sec-title {
-    font-size: 44px;
+    font-size: 38px;
+  }
+
+  .ivt .trow__name {
+    font-size: 26px;
   }
 }
+
 

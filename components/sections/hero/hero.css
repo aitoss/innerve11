@@ -8,13 +8,58 @@
   --headTop: 9%;
   --ctaTop: 34%;
 }
+/* ---- small tablets 431px – 767px ---- */
 @media (max-width: 1023px) {
   .flame__stage {
     --bandTop: 66%;
-    --fig: min(35svh, 70vw);
-    --figBottom: 196px;
+    --fig: min(28svh, 65vw);              /* smaller cap at short viewports so Rengoku fits between button and text */
+    --figBottom: clamp(215px, 29svh, 260px);
     --headTop: 9%;
-    --ctaTop: 25%;
+    --ctaTop: 32%;  /* 32% clears sub-labels even at 767px wide where headline is tallest */
+  }
+}
+
+/* ---- medium screens 768px – 1023px (wider tablets / small laptops) ---- */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .flame__stage {
+    --fig: min(45svh, 50vw);   /* taller Rengoku, proportional to desktop */
+    --figBottom: 8svh;          /* svh-relative so he always straddles the band */
+    --ctaTop: 36%;
+  }
+}
+
+
+/* ---- mobile phones: 320px – 430px ---- */
+@media (max-width: 430px) {
+  .flame__stage {
+    --bandTop: 60%;
+    --fig: min(32svh, 72vw);
+    --figBottom: 220px; /* > 190px band-copy height, keeps feet above the text */
+    --headTop: 8%;
+    --ctaTop: 27%;
+  }
+  .flame-head { font-size: 23vw; }
+
+  /* band copy: tighter box on phones */
+  .flame-bandCopy {
+    height: 190px;
+    gap: 6px;
+    padding-left: clamp(12px, 4vw, 20px);
+    padding-right: clamp(12px, 4vw, 20px);
+  }
+
+  /* corner metadata – smaller so it fits at 320px */
+  .rz-labels {
+    font-size: clamp(9px, 2.5vw, 11px) !important;
+  }
+
+}
+
+/* ---- very narrow phones ≤ 320px: keep corner text in 2 lines ---- */
+@media (max-width: 320px) {
+  .rz-labels {
+    font-size: clamp(7px, 2.3vw, 9px) !important;
+    letter-spacing: 0.06em !important;
   }
 }
 .flame-band { top: var(--bandTop); }

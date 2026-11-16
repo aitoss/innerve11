@@ -13,12 +13,12 @@ export default function Sponsors() {
           <span className="h-0.5 w-7 bg-red" aria-hidden="true" />
           Past sponsors
         </div>
-        <h2 className="sec-title font-display uppercase leading-[0.9] tracking-[-0.01em] text-[clamp(48px,9vw,150px)]">
+        <h2 className="sec-title font-display uppercase leading-[0.9] tracking-[-0.01em] text-[clamp(48px,9vw,150px)] max-[430px]:text-[clamp(36px,11vw,54px)]">
           Allies of the <em>corps.</em>
         </h2>
         <div
           id="agrid"
-          className="agrid mt-[clamp(32px,5vw,60px)] grid auto-rows-[150px] grid-cols-4 gap-3 max-[960px]:auto-rows-[120px] max-[960px]:grid-cols-2"
+          className="agrid mt-[clamp(32px,5vw,60px)] grid auto-rows-[150px] grid-cols-4 gap-3 max-[960px]:auto-rows-[120px] max-[960px]:grid-cols-2 max-[640px]:grid-cols-2 max-[430px]:auto-rows-[100px] max-[430px]:grid-cols-1"
         >
           {SPONSORS.map((s) => (
             <a
@@ -27,7 +27,7 @@ export default function Sponsors() {
               target="_blank"
               rel="noopener"
               className={`atile group relative flex items-center justify-center overflow-hidden border border-ink/15 bg-card p-[34px_24px_20px] transition-[background,border-color] duration-[400ms] hover:border-red hover:bg-red ${
-                s.size === "xl" ? "atile--xl col-span-2 row-span-2" : s.size === "l" ? "atile--l col-span-2" : ""
+                s.size === "xl" ? "atile--xl col-span-2 row-span-2 max-[430px]:col-span-1 max-[430px]:row-span-1" : s.size === "l" ? "atile--l col-span-2 max-[430px]:col-span-1" : ""
               }`}
             >
               <span className="atile__tier absolute left-[14px] top-3 text-[10px] font-semibold uppercase tracking-[0.22em] opacity-60 group-hover:text-paper group-hover:opacity-90">

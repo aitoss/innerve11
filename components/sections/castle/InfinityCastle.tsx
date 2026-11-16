@@ -97,7 +97,7 @@ export default function InfinityCastle() {
           <div className="castle__kicker mb-2 font-kanji text-[clamp(16px,2vw,24px)] tracking-[0.2em] text-amber">
             無限城 · Mugen-jō
           </div>
-          <h2 className="castle__title font-display uppercase leading-[0.84] tracking-[-0.01em] text-[clamp(64px,11vw,190px)] [text-shadow:0_10px_50px_rgba(0,0,0,.6)]">
+          <h2 className="castle__title font-display uppercase leading-[0.84] tracking-[-0.01em] text-[clamp(64px,11vw,190px)] max-[430px]:text-[clamp(48px,15vw,80px)] [text-shadow:0_10px_50px_rgba(0,0,0,.6)]">
             <span className="mask block overflow-hidden">
               <span className="block">Infinity</span>
             </span>
@@ -105,7 +105,7 @@ export default function InfinityCastle() {
               <span className="block">Castle.</span>
             </span>
           </h2>
-          <p className="castle__sub mt-[18px] max-w-[44ch] opacity-[.85]">
+          <p className="castle__sub mt-[18px] max-w-[44ch] opacity-[.85] max-[430px]:text-sm max-[430px]:max-w-[90%]">
             Every room is a problem statement. Six Upper Moons stand between you and dawn.
           </p>
         </div>
@@ -156,7 +156,7 @@ export default function InfinityCastle() {
             The Bounty
           </div>
         </div>
-        <div className="castle__bar absolute left-gut right-gut top-[84px] z-[2] h-0.5 bg-paper/15">
+        <div className="castle__bar absolute left-gut right-gut top-[84px] max-[430px]:top-[60px] z-[2] h-0.5 bg-paper/15">
           <i id="castleBar" className="absolute inset-0 origin-left scale-x-0 bg-gradient-to-r from-red to-amber" />
           <div id="castleTicks" className="castle__ticks pointer-events-none absolute inset-0">
             {gates.map((g) => (
