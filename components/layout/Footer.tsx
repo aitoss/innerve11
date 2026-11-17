@@ -2,8 +2,8 @@ import "./footer.css";
 
 export default function Footer() {
   return (
-    <footer className="foot foot-ichimatsu relative grid grid-cols-[2fr_1fr_1fr] gap-10 border-t border-paper/15 bg-ink px-gut pb-7 pt-[70px] max-[960px]:grid-cols-2 max-[640px]:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] max-[640px]:gap-x-4 max-[640px]:gap-y-8">
-      <div className="foot__brand max-[960px]:col-span-2">
+    <footer className="foot foot-ichimatsu relative grid grid-cols-[2fr_1fr_1fr] gap-10 border-t border-paper/15 bg-ink px-gut pb-7 pt-[70px] max-[960px]:grid-cols-2 max-[640px]:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] max-[640px]:gap-x-4 max-[640px]:gap-y-8 max-[430px]:grid-cols-1 max-[430px]:gap-6">
+      <div className="foot__brand max-[960px]:col-span-2 max-[430px]:col-span-1">
         <div className="foot__word font-display leading-[0.9] text-[clamp(48px,7vw,100px)]">
           INNERVE <b className="font-normal text-red">11</b>
         </div>
@@ -57,7 +57,7 @@ export default function Footer() {
           FAQ
         </a>
       </div>
-      <div className="foot__base col-span-full flex flex-wrap justify-between gap-5 border-t border-paper/10 pt-6 text-xs opacity-60 lg:pr-16 max-lg:pb-12">
+      <div className="foot__base col-span-full flex flex-wrap justify-between gap-5 border-t border-paper/10 pt-6 text-xs opacity-60 lg:pr-16 max-lg:pb-12 max-[430px]:flex-col max-[430px]:gap-3">
         <span>© 2026 Innerve · OSS Club AIT</span>
         <span>
           A fan-made tribute theme. Not affiliated with Demon Slayer, Koyoharu Gotouge or Ufotable. · psst… type{" "}

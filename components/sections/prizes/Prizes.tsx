@@ -62,12 +62,12 @@ export default function Prizes() {
           <span className="h-0.5 w-7 bg-red" aria-hidden="true" />
           Prize pool
         </div>
-        <div className="prizes__big flex items-start font-display leading-[0.8] tracking-[-0.02em] text-[clamp(110px,30vw,460px)]">
+        <div className="prizes__big flex items-start font-display leading-[0.8] tracking-[-0.02em] text-[clamp(80px,28vw,460px)] max-[430px]:text-[clamp(72px,24vw,110px)]">
           <span className="rs mr-[0.05em] mt-[0.25em] text-[0.32em] text-red">₹</span>
           <span id="poolNum">0</span>
           <span className="lacs mb-[0.2em] ml-[0.1em] self-end text-[0.18em] text-red">Lacs+</span>
         </div>
-        <p className="prizes__note mt-6 max-w-[46ch] opacity-75">
+        <p className="prizes__note mt-6 max-w-[46ch] opacity-75 max-[430px]:text-sm max-[430px]:max-w-[90%]">
           Cash, goodies, certificates and a few surprises for those who survive the night.
         </p>
       </div>

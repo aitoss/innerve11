@@ -184,9 +184,32 @@
   grid-template-rows: 1fr;
 }
 
-@media (max-width: 420px) {
+/* ---- phones: 320px – 430px ---- */
+@media (max-width: 430px) {
   .ivf .sec-title {
     white-space: normal;
+    font-size: clamp(40px, 12vw, 60px);
+  }
+
+  /* tabs: smaller text so they all fit without horizontal scroll */
+  .ivf .faq__tab {
+    padding: 8px 12px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+  }
+
+  /* question text slightly smaller */
+  .ivf .qa button {
+    font-size: clamp(15px, 4.2vw, 18px);
+    padding: 18px 0;
+    gap: 12px;
   }
 }
+
+@media (max-width: 360px) {
+  .ivf .sec-title {
+    font-size: 36px;
+  }
+}
+
 
