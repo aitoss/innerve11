@@ -126,12 +126,9 @@ export const drawPlaque =
     g.strokeRect(26, 26, w - 52, h - 52);
     g.textBaseline = "alphabetic";
     g.textAlign = "left";
-    g.fillStyle = "#ff3b57";
-    g.font = "800 64px 'Shippori Mincho B1', serif";
-    g.fillText(n.k, 62, 112);
     g.fillStyle = "#ffb36b";
     g.font = "600 30px Inter, sans-serif";
-    g.fillText(("Night " + n.n).toUpperCase().split("").join(" "), 138, 104);
+    g.fillText(("Night " + n.n).toUpperCase().split("").join(" "), 62, 104);
     g.fillStyle = "#efe8dc";
     g.font = "400 168px Anton, Impact, sans-serif";
     g.fillText(n.day, 58, 288);

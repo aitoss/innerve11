@@ -95,9 +95,7 @@ export function initDriver(): () => void {
     /* ----- INFINITY CASTLE (3D in lib/castle/; this drives it) ----- */
     const CASTLE = (window.CASTLE = window.CASTLE || { progress: 0 });
     const barEl = $("#castleBar");
-    const onShift = () => flash(0.22);
-    window.addEventListener("castle-shift", onShift);
-    cleanups.push(() => window.removeEventListener("castle-shift", onShift));
+    // room rearrangements no longer flash a grey wash over the screen: the rooms glide on their own
     void SFX;
 
     const castleTl = gsap.timeline({
@@ -121,6 +119,31 @@ export function initDriver(): () => void {
       .call(() => SFX.play("gong"), [], 0.9)
       .call(() => flash(0.5), [], 0.965)
       .to({}, { duration: 0.02 }, 0.98);
+
+    /* Keep the rider at the same castle progress across re-measures. A real
+       resize (orientation change, window drag) re-measures the pin distance,
+       which is viewport-based, so the preserved scroll pixels remap to a
+       different progress and the camera visibly jumps mid-ride. Save progress
+       when a refresh starts and restore the matching scroll position after. */
+    let rideProgress: number | null = null;
+    const onRefreshInit = () => {
+      const st = castleTl.scrollTrigger;
+      const y = window.scrollY;
+      rideProgress = st && y >= st.start && y <= st.end ? CASTLE.progress : null;
+    };
+    const onRefresh = () => {
+      const st = castleTl.scrollTrigger;
+      if (!st || rideProgress === null) return;
+      const y = st.start + rideProgress * (st.end - st.start);
+      rideProgress = null;
+      if (Math.abs(window.scrollY - y) > 2) lenis.scrollTo(y, { immediate: true, force: true });
+    };
+    ScrollTrigger.addEventListener("refreshInit", onRefreshInit);
+    ScrollTrigger.addEventListener("refresh", onRefresh);
+    cleanups.push(() => {
+      ScrollTrigger.removeEventListener("refreshInit", onRefreshInit);
+      ScrollTrigger.removeEventListener("refresh", onRefresh);
+    });
 
     /* ----- PRIZES ----- */
     const pool = { v: 0 };

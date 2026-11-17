@@ -94,9 +94,6 @@ export default function InfinityCastle() {
         />
         <div className="castle__vig pointer-events-none absolute inset-0 bg-[radial-gradient(90%_80%_at_50%_50%,transparent_40%,rgba(12,5,8,.85))]" />
         <div className="castle__copy absolute bottom-[14vh] left-gut z-[2] max-w-[680px]">
-          <div className="castle__kicker mb-2 font-kanji text-[clamp(16px,2vw,24px)] tracking-[0.2em] text-amber">
-            無限城 · Mugen-jō
-          </div>
           <h2 className="castle__title font-display uppercase leading-[0.84] tracking-[-0.01em] text-[clamp(64px,11vw,190px)] max-[430px]:text-[clamp(48px,15vw,80px)] [text-shadow:0_10px_50px_rgba(0,0,0,.6)]">
             <span className="mask block overflow-hidden">
               <span className="block">Infinity</span>
@@ -116,10 +113,6 @@ export default function InfinityCastle() {
         >
           {activeMoon && (
             <>
-              <b className="block font-kanji text-[clamp(30px,4vw,56px)] text-red [text-shadow:0_0_30px_rgba(200,16,46,.6)]">
-                {activeMoon.kanji}
-              </b>
-              <span className="text-xs font-semibold uppercase tracking-[0.3em]">{activeMoon.caption}</span>
             </>
           )}
         </div>
@@ -127,12 +120,12 @@ export default function InfinityCastle() {
           ref={nightRef}
           id="castleNight"
           aria-live="polite"
-          className="castle__night pointer-events-none absolute bottom-[14vh] left-gut z-[2] max-w-[min(560px,62vw)] opacity-0 [text-shadow:0_4px_30px_rgba(0,0,0,.8)] max-[640px]:bottom-[22vh] max-[640px]:max-w-[58vw]"
+          className="castle__night pointer-events-none absolute bottom-[14vh] left-1/2 -translate-x-1/2 text-center z-[2] w-[min(560px,86vw)] opacity-0 [text-shadow:0_4px_30px_rgba(0,0,0,.8)] max-[640px]:bottom-[22vh]"
         >
-          {night && (
+          {night ? (
             <>
               <span className="castle__nk mb-2 block font-kanji text-[clamp(14px,1.6vw,20px)] tracking-[0.2em] text-amber">
-                {night.k} · Night {night.n}
+                Night {night.n}
               </span>
               <b className="block font-display uppercase leading-[0.9] text-[clamp(44px,7vw,108px)] text-paper max-[640px]:text-[clamp(38px,12vw,56px)]">
                 {night.day} <em className="ml-[0.15em] text-[0.42em] not-italic text-rose">{night.yr}</em>
@@ -146,7 +139,7 @@ export default function InfinityCastle() {
                 </span>
               )}
             </>
-          )}
+          ) : null}
         </div>
         <div className="castle__end pointer-events-none absolute inset-0 z-[3] flex flex-col items-center justify-center text-center opacity-0">
           <div className="castle__kicker mb-2 font-kanji text-[clamp(16px,2vw,24px)] tracking-[0.2em] text-amber">
@@ -159,14 +152,14 @@ export default function InfinityCastle() {
         <div className="castle__bar absolute left-gut right-gut top-[84px] max-[430px]:top-[60px] z-[2] h-0.5 bg-paper/15">
           <i id="castleBar" className="absolute inset-0 origin-left scale-x-0 bg-gradient-to-r from-red to-amber" />
           <div id="castleTicks" className="castle__ticks pointer-events-none absolute inset-0">
-            {gates.map((g) => (
+            {gates.map((g, gi) => (
               <i
                 key={g.n}
                 style={{ left: `${(g.p * 100).toFixed(2)}%` }}
                 className="absolute top-[-5px] h-3 w-0.5 -translate-x-[1px] bg-amber"
               >
-                <b className="absolute left-1/2 top-[14px] -translate-x-1/2 font-kanji text-[13px] font-normal text-amber">
-                  {g.k}
+                <b className={`absolute left-1/2 -translate-x-1/2 ${gi % 2 ? "bottom-[14px]" : "top-[14px]"} whitespace-nowrap font-display text-[11px] font-normal tracking-[0.08em] text-amber`}>
+                  {g.day}
                 </b>
               </i>
             ))}
