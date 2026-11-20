@@ -14,8 +14,6 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
 import { gsap } from "gsap";
 import {
   CASTLE_FLOOR_A,
-  CASTLE_FLOOR_B,
-  CASTLE_SHAFT_Z,
   NIGHT_GATES,
   UPPER_MOONS,
   ROUTE_EXTRAS,
@@ -135,34 +133,8 @@ export function startCastle(host: HTMLCanvasElement): () => void {
       lantern(-side * 2.4, fy + 4.8, z - 5, world);
     }
   };
-  corridor(10, -94, CASTLE_FLOOR_A);
-  corridor(-112, -222, CASTLE_FLOOR_B);
-
-  // the shaft: four glowing shoji walls you fall between
-  const SH = 4.2;
-  const wall = (w, h, x, y, z, ry) => {
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), M.shojiTall);
-    m.position.set(x, y, z);
-    m.rotation.y = ry;
-    world.add(m);
-  };
-  wall(2 * SH, 82, -SH, -43, CASTLE_SHAFT_Z, Math.PI / 2);
-  wall(2 * SH, 82, SH, -43, CASTLE_SHAFT_Z, -Math.PI / 2);
-  wall(2 * SH, 76, 0, -46, CASTLE_SHAFT_Z + SH, Math.PI); // near wall starts below corridor A
-  wall(2 * SH, 76, 0, -38, CASTLE_SHAFT_Z - SH, 0); // far wall ends above corridor B
-  for (let y = -8, k = 0; y > -80; y -= 9, k++) {
-    [[0, CASTLE_SHAFT_Z + SH], [0, CASTLE_SHAFT_Z - SH]].forEach(([x, z]) => {
-      const b = box(2 * SH + 0.6, 0.4, 0.4, M.beam);
-      b.position.set(x, y, z);
-      world.add(b);
-    });
-    [[-SH, CASTLE_SHAFT_Z], [SH, CASTLE_SHAFT_Z]].forEach(([x, z]) => {
-      const b = box(0.4, 0.4, 2 * SH + 0.6, M.beam);
-      b.position.set(x, y, z);
-      world.add(b);
-    });
-    lantern(k % 2 ? -SH + 0.7 : SH - 0.7, y - 1, CASTLE_SHAFT_Z + (k % 2 ? 1.5 : -1.5), world);
-  }
+  // one straight corridor the whole way: the undated shaft drop was removed on request
+  corridor(10, -222, CASTLE_FLOOR_A);
 
   /* ---------- bake the static architecture: one draw call per material ---------- */
   {
@@ -184,7 +156,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
      "shift" re-places them with a smooth tween instead of popping them in and out. */
   const rooms = new THREE.Group();
   scene.add(rooms);
-  rooms.position.set(0, -40, -105);
+  rooms.position.set(0, -20, -105);
   const rnd = (a, b) => a + Math.random() * (b - a);
   const roomMats = [M.shoji, M.wood, M.tatami, M.beam, M.red];
   const perMat = mobile ? 22 : 44;
@@ -213,7 +185,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   // encounter anchors (world coords): floating rooms must never cover a character
   const anchors = UPPER_MOONS.concat(ROUTE_EXTRAS).map((m) => ({
     x: m.x,
-    y: m.z === CASTLE_SHAFT_Z ? m.fy : m.fy + m.height / 2 + 0.2,
+    y: m.fy + m.height / 2 + 0.2,
     z: m.z,
   }));
   const clearOfDemons = (wx, wy, wz, radius) => {
@@ -229,7 +201,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   // the right-hand side of the terminal approach (final doors at z=-208):
   // keep big room faces out of the end view's right half so only the authored
   // doors and corridor remain there. Front (doors) and left side untouched.
-  const END = { x0: 2, x1: 16, y0: -88, y1: -70, z0: -186, z1: -224 };
+  const END = { x0: 2, x1: 16, y0: CASTLE_FLOOR_A - 5.8, y1: CASTLE_FLOOR_A + 12.2, z0: -186, z1: -224 };
   const clearOfEnd = (wx, wy, wz, radius) => {
     const cx = Math.max(END.x0, Math.min(END.x1, wx));
     const cy = Math.max(END.y0, Math.min(END.y1, wy));
@@ -398,27 +370,15 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   }
 
   /* ---------- camera path ---------- */
+  // a single straight line from the entrance to the final doors
   const path = new THREE.CatmullRomCurve3(
     [
       new THREE.Vector3(0, 0.4, 9),
       new THREE.Vector3(0, 0.4, -40),
       new THREE.Vector3(0, 0.4, -88),
-      // the two turns of the drop are rounded arcs (radius ~16) instead of near right-angle corners,
-      // so the camera's rotation ramps up and settles instead of snapping
-      new THREE.Vector3(0, -1.7, -96),
-      new THREE.Vector3(0, -7.6, -101.9),
-      new THREE.Vector3(0, -15.6, -104),
-      new THREE.Vector3(0, -45, -104),
-      new THREE.Vector3(0, -62, -104),
-      // the exit arc has to be below the shaft's far wall (it ends at y -76) before it crosses that wall's plane, or the lens sits inside the wall
-      new THREE.Vector3(0, -67.6, -104),
-      new THREE.Vector3(0, -73.2, -105.2),
-      new THREE.Vector3(0, -76.1, -106.5),
-      new THREE.Vector3(0, -78.6, -109.6),
-      new THREE.Vector3(0, -79.6, -115),
-      new THREE.Vector3(0, -79.6, -121.6),
-      new THREE.Vector3(0, -79.6, -170),
-      new THREE.Vector3(0, -79.6, -203),
+      new THREE.Vector3(0, 0.4, -130),
+      new THREE.Vector3(0, 0.4, -170),
+      new THREE.Vector3(0, 0.4, -203),
     ],
     false,
     "centripetal"
@@ -443,9 +403,8 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   // each demon: the official art as a billboard
   const addDemon = (i, { id, kanji, x, fy, z, height, onPlatform }) => {
     const g = new THREE.Group();
-    // Center the art in its own encounter plane, including during the vertical fall.
-    const inShaft = z === CASTLE_SHAFT_Z;
-    g.position.set(x, inShaft ? fy : fy + height / 2 + 0.2, z);
+    // Center the art in its own encounter plane.
+    g.position.set(x, fy + height / 2 + 0.2, z);
     scene.add(g);
     const d = { g, i, h: height, x0: x, y0: g.position.y, side: Math.sign(x) || 1, lunge: 0, lunged: false, turn: 0, flat: null };
     demons.push(d);
@@ -549,7 +508,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
 
   /* ---------- the final doors ---------- */
   const DOOR_Z = -208;
-  const DY = CASTLE_FLOOR_B + 3.2;
+  const DY = CASTLE_FLOOR_A + 3.2;
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 6.2), new THREE.MeshBasicMaterial({ color: "#ff1030", fog: false, toneMapped: false }));
   glow.position.set(0, DY, DOOR_Z - 0.6);
   scene.add(glow);
@@ -571,20 +530,15 @@ export function startCastle(host: HTMLCanvasElement): () => void {
     const mat = new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color(0.92, 0.92, 0.92), toneMapped: false, fog: true, transparent: true });
     const m = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 2.6), mat);
     const y = n.fy + 4.35;
-    // a gate inside the shaft hangs off to one side of the fall line (the camera drops through x = 0),
-    // smaller, and turns to face the camera
-    n.inShaft = n.z === CASTLE_SHAFT_Z;
-    const gx = n.inShaft ? 2.5 : 0;
-    if (n.inShaft) m.scale.setScalar(0.6);
+    const gx = 0;
     m.position.set(gx, y, n.z + 0.05);
-    m.visible = !n.inShaft; // no gate sits in the shaft: every date hangs as a framed board like the rest
     scene.add(m);
-    (n.inShaft ? [] : [-2.3, 2.3]).forEach((x) => {
+    [-2.3, 2.3].forEach((x) => {
       const c = box(0.07, 1.1, 0.07, M.beam);
       c.position.set(x, y + 1.85, n.z);
       scene.add(c);
     });
-    if (!n.inShaft) {
+    {
       const rim = box(5.5, 0.14, 0.2, M.red);
       rim.position.set(0, y - 1.35, n.z);
       scene.add(rim);
@@ -642,7 +596,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   const dust = new Float32Array(dustN * 3);
   for (let i = 0; i < dustN; i++) {
     dust[i * 3] = rnd(-24, 24);
-    dust[i * 3 + 1] = rnd(-95, 15);
+    dust[i * 3 + 1] = rnd(-55, 15);
     dust[i * 3 + 2] = rnd(-225, 12);
   }
   const dg = new THREE.BufferGeometry();
@@ -803,7 +757,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
     tmp.copy(camera.position).add(fwd);
     m4.lookAt(camera.position, tmp, up);
     qLook.setFromRotationMatrix(m4);
-    shaftness = smoothstep(-camera.position.y, 4, 10) * (1 - smoothstep(-camera.position.y, 60, 68));
+    shaftness = smoothstep(-camera.position.y, 4, 10) * (1 - smoothstep(-camera.position.y, 20, 28));
     const roll = Math.sin(p * Math.PI * 2.4) * 0.1 + vert * Math.sin(t * 0.8) * 0.16 + shiftKick * 0.1 * (1 - 0.6 * shaftness);
     qRoll.setFromAxisAngle(Z, roll);
     camera.quaternion.copy(qLook).multiply(qRoll);
@@ -897,8 +851,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
     }
     // gate plaques sway a hair
     plaques.forEach((m, i) => {
-      if (nights[i].inShaft) m.quaternion.copy(camera.quaternion);
-      else m.rotation.z = Math.sin(t * 0.9 + i * 2) * 0.008;
+      m.rotation.z = Math.sin(t * 0.9 + i * 2) * 0.008;
       // dissolve before the camera passes it (an opaque plaque at close range fills a portrait screen)
       m.material.opacity = smoothstep(camera.position.distanceTo(m.position), 6.0, 9.0);
     });
