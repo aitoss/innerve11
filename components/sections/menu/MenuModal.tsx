@@ -637,6 +637,7 @@ export default function MenuModal({
                     <img
                       src={activeSection.image}
                       alt={activeSection.title}
+                      draggable={false}
                       className="relative z-10 h-full w-full object-contain object-bottom drop-shadow-[0_16px_32px_rgba(42,27,22,0.25)] transition-transform duration-500 hover:scale-105"
                     />
                   </div>

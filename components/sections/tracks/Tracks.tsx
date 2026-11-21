@@ -111,7 +111,7 @@ export default function Tracks() {
                   <rect width="100%" height="100%" fill={`url(#${track.pat})`} />
                 </svg>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={track.img} alt="" loading="lazy" />
+                <img src={track.img} alt="" loading="lazy" draggable={false} />
                 <span className="trow__kanji">{track.kanji}</span>
               </div>
               <div className="trow__in">
