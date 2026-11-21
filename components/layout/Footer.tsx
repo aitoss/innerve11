@@ -76,10 +76,10 @@ export default function Footer() {
           ))}
         </ul>
       </section>
-      <div className="foot__base col-span-full flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-paper/10 pt-3 lg:pr-16 max-lg:pb-12">
+      <div className="foot__base col-span-full flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-paper/10 pt-3 lg:pr-16 max-lg:pb-[100px]">
         <p className="font-medium">
           Made with{" "}
-          <img src="/assets/img/footer-heart.png" alt="love" width={24} height={24} className="inline-block align-[-0.35em]" />{" "}
+          <img src="/assets/img/footer-heart.png" alt="love" width={24} height={24} draggable={false} className="inline-block align-[-0.35em]" />{" "}
           by Open Source Software Club
         </p>
         <nav aria-label="Innerve contact and social links" className="flex flex-wrap items-center gap-1">

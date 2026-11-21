@@ -31,6 +31,7 @@ export default function Sponsors({ formUrl = SPONSOR_FORM_URL }: SponsorsProps) 
               href={s.url}
               target="_blank"
               rel="noopener"
+              draggable={false}
               className={`atile group relative flex items-center justify-center overflow-hidden border border-ink/15 bg-card p-[34px_24px_20px] transition-[background,border-color] duration-[400ms] hover:border-red hover:bg-red ${
                 s.size === "xl" ? "atile--xl col-span-2 row-span-2 max-[430px]:col-span-1 max-[430px]:row-span-1" : s.size === "l" ? "atile--l col-span-2 max-[430px]:col-span-1" : ""
               }`}
@@ -42,6 +43,7 @@ export default function Sponsors({ formUrl = SPONSOR_FORM_URL }: SponsorsProps) 
                 src={`assets/logos/sponsors/${s.logo}`}
                 alt={s.alt ?? s.name}
                 loading="lazy"
+                draggable={false}
                 className={`max-w-[76%] object-contain transition-[transform,background,padding] duration-[400ms] group-hover:scale-[1.06] ${
                   s.size === "xl"
                     ? "max-h-[110px] group-hover:bg-paper group-hover:px-6 group-hover:py-[18px]"

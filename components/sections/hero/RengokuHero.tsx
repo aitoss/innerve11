@@ -320,6 +320,7 @@ export default function RengokuHero() {
                           width={750}
                           height={1186}
                           alt=""
+                          draggable={false}
                           fetchPriority="high"
                           className="flame-fig block w-auto max-w-none"
                         />
