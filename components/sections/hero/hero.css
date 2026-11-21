@@ -184,6 +184,33 @@
   will-change: transform;
 }
 
+/* ---- phones: intro line is hidden, so lift the countdown + CTA as one block ---- */
+@media (max-width: 639px) {
+  .flame-bandCopy {
+    height: 188px;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    padding-top: 10px;
+    padding-bottom: 12px;
+  }
+  /* this margin only existed to separate the timer from the intro line */
+  .flame-bandCopy [role="timer"] {
+    margin-top: 0;
+    min-height: 0;
+    text-align: center;
+  }
+  /* "Hackathon begins in" + "Registration …" centred under the figure */
+  .flame-bandCopy [role="timer"] > span,
+  .flame-bandCopy a {
+    text-align: center;
+  }
+  .flame-bandCopy [role="timer"] span[aria-hidden="true"],
+  .flame-bandCopy a > span:last-child {
+    justify-content: center;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* the film strip only exists as a scroll sweep */
   .r-tapeRot,

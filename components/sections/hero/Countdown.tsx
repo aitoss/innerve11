@@ -66,7 +66,7 @@ export default function Countdown() {
 
   return (
     <div className="mt-3 min-h-[64px] text-left lg:mt-4" role="timer" aria-label={sr}>
-      <span className="block text-left text-[clamp(10px,0.8vw,12px)] font-medium uppercase tracking-[0.18em] text-haori/70">
+      <span className="block text-left text-[clamp(10px,0.8vw,12px)] max-sm:text-[12px] font-medium uppercase tracking-[0.18em] text-haori/70">
         {label}
       </span>
       {!p?.done && (
@@ -78,11 +78,11 @@ export default function Countdown() {
             // Column width comes from the digit glyphs themselves (tabular-nums keeps
             // it constant as values change), so the first digit sits flush with the
             // "Hackathon begins in" label above and each unit label centers exactly.
-            <span key={u} className="flex flex-col items-center" style={{ fontSize: "clamp(20px,1.9vw,30px)" }}>
+            <span key={u} className="flex flex-col items-center text-[clamp(20px,1.9vw,30px)] max-sm:text-[24px]">
               <span className="block whitespace-nowrap text-center tabular-nums" style={{ fontVariantNumeric: "tabular-nums" }}>
                 {v}
               </span>
-              <span className="mt-1.5 block whitespace-nowrap pl-[0.18em] text-center text-[9px] font-medium uppercase leading-none tracking-[0.18em] text-haori/60">
+              <span className="mt-1.5 block whitespace-nowrap pl-[0.18em] text-center text-[9px] max-sm:text-[10px] font-medium uppercase leading-none tracking-[0.18em] text-haori/60">
                 {u}
               </span>
             </span>
