@@ -4,11 +4,11 @@ import type { Prize } from "@/types/content";
 export const POOL_LACS = 12;
 
 export const PRIZES: Prize[] = [
-  { rank: "1st Prize", kanji: "壱", amt: "125K+", hot: true },
-  { rank: "2nd Prize", kanji: "弐", amt: "75K+" },
-  { rank: "3rd Prize", kanji: "参", amt: "50K+" },
-  { rank: "Ingenious Spark", kanji: "閃", amt: "25K+", span: "wide" },
-  { rank: "Visionary Spark", kanji: "光", amt: "15K+", span: "wide" },
+  { rank: "1st Prize", kanji: "壱", amt: "125K+", hot: true, span: "wide", size: "lg" },
+  { rank: "2nd Prize", kanji: "弐", amt: "75K+", span: "wide", size: "lg", borderAccent: true },
+  { rank: "3rd Prize", kanji: "参", amt: "50K+", size: "sm" },
+  { rank: "Ingenious Spark", kanji: "閃", amt: "25K+", size: "sm" },
+  { rank: "Visionary Spark", kanji: "光", amt: "15K+", size: "sm" },
 ];
 
 export const PRIZE_PERKS = [

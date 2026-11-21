@@ -4,40 +4,73 @@ import "./prizes.css";
 
 function PrizeCard({ prize }: { prize: Prize }) {
   const isHot = Boolean(prize.hot);
-  const gridSpan =
-    prize.span === "wide"
-      ? "col-span-3 max-[960px]:col-span-1"
-      : "col-span-2 max-[960px]:col-span-1 max-[960px]:first:col-span-2 max-[640px]:first:col-span-1";
+  const isBorderAccent = Boolean(prize.borderAccent);
+  const isLarge = prize.size === "lg" || prize.span === "wide";
+
+  const gridSpan = isLarge
+    ? "col-span-3 max-[860px]:col-span-1"
+    : "col-span-2 max-[860px]:col-span-1";
+
+  const borderClass = isHot
+    ? "pcard--hot border-red bg-red"
+    : isBorderAccent
+      ? "pcard--second border-red bg-ink2 hover:border-red hover:shadow-[0_0_30px_rgba(200,16,46,0.3)]"
+      : "border-paper/20 bg-ink2 hover:border-red";
 
   return (
     <div className={`pcard-wrap ${gridSpan}`}>
       <article
-        className={`pcard border ${
-          isHot ? "pcard--hot border-red bg-red" : "border-paper/20 bg-ink2 hover:border-red"
-        }`}
+        className={`pcard ${isLarge ? "pcard--lg" : "pcard--sm"} border ${borderClass}`}
       >
         <span
           aria-hidden="true"
-          className={`pcard__k absolute left-[18px] top-[22px] font-brush text-5xl leading-none [writing-mode:vertical-rl] ${
-            isHot ? "text-ink" : "text-red"
-          }`}
+          className={`pcard__k absolute leading-none [writing-mode:vertical-rl] font-brush ${
+            isLarge
+              ? "left-[20px] top-[24px] text-5xl md:text-6xl max-[430px]:text-4xl"
+              : "left-[16px] top-[20px] text-4xl md:text-5xl max-[430px]:text-3xl"
+          } ${isHot ? "text-ink" : "text-red"}`}
         >
           {prize.kanji}
         </span>
 
-        <div className="pcard__rank text-xs font-semibold uppercase tracking-[0.3em]">
+        <div
+          className={`pcard__rank uppercase ${
+            isLarge
+              ? "text-xs md:text-sm font-bold tracking-[0.3em]"
+              : "text-[11px] md:text-xs font-semibold tracking-[0.22em] text-paper/85"
+          }`}
+        >
           {prize.rank}
         </div>
 
-        <div className="pcard__amt mb-auto mt-[14px] font-display leading-none text-[clamp(56px,6vw,96px)]">
+        <div
+          className={`pcard__amt mb-auto font-display leading-none ${
+            isLarge
+              ? "mt-4 text-[clamp(60px,5.8vw,100px)] max-[430px]:text-[52px]"
+              : "mt-3 text-[clamp(42px,3.8vw,64px)] max-[430px]:text-[38px]"
+          }`}
+        >
           <small className="mr-1 align-top text-[0.45em]">₹</small>
           {prize.amt}
         </div>
 
-        <ul className="mt-6 list-none text-[13px] opacity-[.85]">
+        <ul
+          className={`list-none ${
+            isLarge
+              ? "mt-6 text-[13px] md:text-sm opacity-[.88]"
+              : "mt-4 text-xs md:text-[13px] opacity-[.82]"
+          }`}
+        >
           {PRIZE_PERKS.map((perk) => (
-            <li key={perk} className="border-t border-paper/20 py-2">
-              <span className={`mr-1 align-[2px] text-[9px] ${isHot ? "text-ink" : "text-red"}`}>
+            <li
+              key={perk}
+              className={`border-t border-paper/20 ${isLarge ? "py-2.5" : "py-1.5"}`}
+            >
+              <span
+                className={`mr-1.5 align-[2px] ${
+                  isLarge ? "text-[10px]" : "text-[8px]"
+                } ${isHot ? "text-ink" : "text-red"}`}
+              >
                 ◆
               </span>
               {perk}
@@ -75,7 +108,7 @@ export default function Prizes() {
       <div className="wrap mx-auto w-[min(1320px,100%)] px-gut">
         <div
           id="pcards"
-          className="pcards grid grid-cols-6 gap-4 max-[960px]:grid-cols-2 max-[640px]:grid-cols-1"
+          className="pcards grid grid-cols-6 gap-4 max-[860px]:grid-cols-1"
         >
           {PRIZES.map((prize) => (
             <PrizeCard key={prize.rank} prize={prize} />

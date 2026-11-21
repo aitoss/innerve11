@@ -1,5 +1,7 @@
 import type { Sponsor } from "@/types/content";
 
+export const SPONSOR_FORM_URL = "https://forms.gle/innerve11-sponsor";
+
 export const SPONSORS: Sponsor[] = [
   { tier: "Title Sponsor", name: "Keychain", logo: "keyChainLogo.svg", url: "https://www.keychain.com/", size: "xl" },
   { tier: "Platinum Sponsor", name: "miniOrange", logo: "miniOrange-black.svg", url: "https://www.miniorange.com/", size: "l" },

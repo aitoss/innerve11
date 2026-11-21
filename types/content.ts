@@ -30,6 +30,8 @@ export interface Prize {
   amt: string;
   hot?: boolean;
   span?: "wide";
+  size?: "lg" | "sm";
+  borderAccent?: boolean;
 }
 
 export interface Testimonial {
