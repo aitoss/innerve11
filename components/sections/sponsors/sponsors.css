@@ -1,0 +1,59 @@
+.sponsor-cta,
+.sponsor-cta__btn {
+  position: relative;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sponsor-cta {
+    transition: transform 350ms ease, box-shadow 350ms ease;
+  }
+
+  .sponsor-cta__btn {
+    transition: transform 300ms ease, box-shadow 300ms ease, background-color 300ms ease;
+  }
+
+  /* Move the sheen without changing the size or position of the content. */
+  .sponsor-cta::after,
+  .sponsor-cta__btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 25%, rgb(255 255 255 / 25%) 50%, transparent 75%);
+    transform: translateX(-120%) skewX(-20deg);
+    transition: transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    pointer-events: none;
+  }
+
+  .sponsor-cta__btn:is(:hover, :focus-visible) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -4px rgb(200 16 46 / 35%);
+  }
+
+  .sponsor-cta__btn:active {
+    transform: scale(0.98);
+  }
+
+  .sponsor-cta__btn:is(:hover, :focus-visible)::after {
+    transform: translateX(120%) skewX(-20deg);
+  }
+
+  .sponsor-cta__arrow {
+    transition: transform 300ms ease;
+  }
+
+  .sponsor-cta__btn:is(:hover, :focus-visible) .sponsor-cta__arrow {
+    transform: translateX(4px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  .sponsor-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -6px rgb(0 0 0 / 12%);
+  }
+
+  .sponsor-cta:hover::after {
+    transform: translateX(120%) skewX(-20deg);
+  }
+}

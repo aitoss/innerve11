@@ -2,8 +2,8 @@ import type { TimelineItem } from "@/types/content";
 
 export const EVENT = {
   name: "Innerve 11",
-  dates: "30–31 Jan 2027",
-  eventStart: "2027-01-30T09:00:00+05:30",
+  dates: "29–30 Jan 2027",
+  eventStart: "2027-01-29T09:00:00+05:30",
   organiser: "OSS Club · AIT Pune",
   timeline: [
     {
@@ -22,14 +22,14 @@ export const EVENT = {
       text: "Shortlisted teams will be announced on January 8, 2027. Check back to see if your team advances.",
     },
     {
-      date: "30 Jan 2027",
+      date: "29 Jan 2027",
       title: "Hackathon Begins",
-      text: "The 24-hour coding marathon starts on January 30, 2027. Build innovative solutions and bring your ideas to life.",
+      text: "The 24-hour coding marathon starts on January 29, 2027. Build innovative solutions and bring your ideas to life.",
     },
     {
-      date: "31 Jan 2027",
+      date: "30 Jan 2027",
       title: "Results Announced",
-      text: "Winners will be announced on January 31, 2027. Exciting prizes and recognition await.",
+      text: "Winners will be announced on January 30, 2027. Exciting prizes and recognition await.",
     },
   ] satisfies TimelineItem[],
 };

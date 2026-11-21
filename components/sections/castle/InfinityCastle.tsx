@@ -94,12 +94,9 @@ export default function InfinityCastle() {
         />
         <div className="castle__vig pointer-events-none absolute inset-0 bg-[radial-gradient(90%_80%_at_50%_50%,transparent_40%,rgba(12,5,8,.85))]" />
         <div className="castle__copy absolute bottom-[14vh] left-gut z-[2] max-w-[680px]">
-          <h2 className="castle__title font-display uppercase leading-[0.84] tracking-[-0.01em] text-[clamp(64px,11vw,190px)] max-[430px]:text-[clamp(48px,15vw,80px)] [text-shadow:0_10px_50px_rgba(0,0,0,.6)]">
+          <h2 className="castle__title font-display uppercase leading-[0.84] tracking-[-0.01em] text-[clamp(64px,11vw,160px)] max-[430px]:text-[clamp(48px,15vw,80px)] [text-shadow:0_10px_50px_rgba(0,0,0,.6)]">
             <span className="mask block overflow-hidden">
-              <span className="block">Infinity</span>
-            </span>
-            <span className="mask block overflow-hidden">
-              <span className="block">Castle.</span>
+              <span className="block">Timeline</span>
             </span>
           </h2>
           <p className="castle__sub mt-[18px] max-w-[44ch] opacity-[.85] max-[430px]:text-sm max-[430px]:max-w-[90%]">
