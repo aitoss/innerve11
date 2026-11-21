@@ -65,6 +65,20 @@ export default function Tracks() {
     row.classList.remove("is-on");
   };
 
+  /* Click / tap toggles a row: the active row collapses, any other row takes over. */
+  const onRowClick = (row: HTMLLIElement) => {
+    const list = listRef.current;
+    if (!list) return;
+    if (row.classList.contains("is-on")) {
+      row.classList.remove("is-on");
+      return;
+    }
+    list
+      .querySelectorAll<HTMLElement>(".trow.is-on")
+      .forEach((other) => other.classList.remove("is-on"));
+    row.classList.add("is-on");
+  };
+
   return (
     <div className="ivt">
       <PatternDefs />
@@ -89,6 +103,7 @@ export default function Tracks() {
               className="trow"
               onMouseEnter={(event) => onRowEnter(event.currentTarget)}
               onMouseLeave={(event) => onRowLeave(event.currentTarget)}
+              onClick={(event) => onRowClick(event.currentTarget)}
             >
               <div className="trow__bg" />
               <div className="trow__art" aria-hidden="true">
