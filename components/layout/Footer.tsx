@@ -1,9 +1,15 @@
+import { FOOTER_LINKS } from "./footerLinks";
 import "./footer.css";
+
+const CONTACTS = [
+  { name: "Anmol Singh", phone: "+91 95094 40704" },
+  { name: "Yashika Yadav", phone: "+91 80533 93959" },
+];
 
 export default function Footer() {
   return (
-    <footer className="foot foot-ichimatsu relative grid grid-cols-[2fr_1fr_1fr] gap-10 border-t border-paper/15 bg-ink px-gut pb-7 pt-[70px] max-[960px]:grid-cols-2 max-[640px]:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] max-[640px]:gap-x-4 max-[640px]:gap-y-8">
-      <div className="foot__brand max-[960px]:col-span-2">
+    <footer className="foot foot-ichimatsu relative grid grid-cols-[2fr_1fr_1fr] gap-10 border-t border-paper/15 bg-ink px-gut pb-7 pt-[70px] max-[960px]:grid-cols-2 max-[640px]:gap-x-4 max-[640px]:gap-y-8 max-[420px]:grid-cols-1">
+      <div className="foot__brand max-[960px]:col-span-full">
         <div className="foot__word font-display leading-[0.9] text-[clamp(48px,7vw,100px)]">
           INNERVE <b className="font-normal text-red">11</b>
         </div>
@@ -12,6 +18,12 @@ export default function Footer() {
           <br />
           Organised by the OSS Club, Army Institute of Technology, Pune.
         </p>
+        <nav aria-label="Footer navigation" className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-paper/[.85]">
+          <a href="#tracks" data-scroll className="py-1 hover:text-red">Tracks</a>
+          <a href="#prizes" data-scroll className="py-1 hover:text-red">Prizes</a>
+          <a href="#timeline" data-scroll className="py-1 hover:text-red">Timeline</a>
+          <a href="#faq" data-scroll className="py-1 hover:text-red">FAQ</a>
+        </nav>
       </div>
       <div className="foot__col">
         <h4 className="mb-3.5 text-[11px] font-semibold uppercase tracking-[0.3em] text-red">Venue</h4>
@@ -42,27 +54,51 @@ export default function Footer() {
           />
         </div>
       </div>
-      <div className="foot__col">
-        <h4 className="mb-3.5 text-[11px] font-semibold uppercase tracking-[0.3em] text-red">Navigate</h4>
-        <a href="#tracks" data-scroll className="block py-[3px] opacity-[.85] hover:text-red">
-          Tracks
-        </a>
-        <a href="#prizes" data-scroll className="block py-[3px] opacity-[.85] hover:text-red">
-          Prizes
-        </a>
-        <a href="#timeline" data-scroll className="block py-[3px] opacity-[.85] hover:text-red">
-          Timeline
-        </a>
-        <a href="#faq" data-scroll className="block py-[3px] opacity-[.85] hover:text-red">
-          FAQ
-        </a>
-      </div>
-      <div className="foot__base col-span-full flex flex-wrap justify-between gap-5 border-t border-paper/10 pt-6 text-xs opacity-60 lg:pr-16 max-lg:pb-12 max-[430px]:flex-col max-[430px]:gap-3">
-        <span>© 2026 Innerve · OSS Club AIT</span>
-        <span>
-          A fan-made tribute theme. Not affiliated with Demon Slayer, Koyoharu Gotouge or Ufotable. · psst… type{" "}
-          <b className="text-red">hinokami</b>
-        </span>
+      <section id="contact" aria-labelledby="contact-heading" className="foot__col">
+        <h2 id="contact-heading" className="mb-3.5 text-[11px] font-semibold uppercase tracking-[0.3em] text-red">
+          Contact Us
+        </h2>
+        <ul className="grid gap-4">
+          {CONTACTS.map(({ name, phone }) => (
+            <li key={phone}>
+              <p className="font-semibold">{name}</p>
+              <a
+                href={`tel:${phone.replaceAll(" ", "")}`}
+                aria-label={`Call ${name} at ${phone}`}
+                className="mt-1 inline-flex min-h-11 items-center rounded-sm border border-paper/20 px-3 py-1.5 text-sm tabular-nums transition-colors hover:border-red hover:bg-red hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-paper"
+              >
+                {phone}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <div className="foot__base col-span-full flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-paper/10 pt-3 lg:pr-16 max-lg:pb-12">
+        <p className="font-medium">
+          Made with{" "}
+          <img src="/assets/img/footer-heart.png" alt="love" width={24} height={24} className="inline-block align-[-0.35em]" />{" "}
+          by Open Source Software Club
+        </p>
+        <nav aria-label="Innerve contact and social links" className="flex flex-wrap items-center gap-1">
+          {FOOTER_LINKS.map(({ label, href, viewBox, path }) => {
+            const external = href.startsWith("https://");
+            return (
+              <a
+                key={href}
+                href={href}
+                target={external ? "_blank" : undefined}
+                rel={external ? "noopener noreferrer" : undefined}
+                aria-label={label}
+                title={label}
+                className="grid h-9 w-9 place-items-center rounded-sm transition-colors hover:bg-paper/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-paper"
+              >
+                <svg aria-hidden="true" viewBox={viewBox} fill="currentColor" className="h-[18px] w-[18px]">
+                  <path d={path} />
+                </svg>
+              </a>
+            );
+          })}
+        </nav>
       </div>
     </footer>
   );

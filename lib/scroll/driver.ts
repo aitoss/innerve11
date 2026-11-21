@@ -210,6 +210,15 @@ export function initDriver(): () => void {
       ease: "power3.out",
       scrollTrigger: { trigger: "#agrid", start: "top 85%" },
     });
+    // Move the wrapper so the banner can lift independently on hover.
+    gsap.from("[data-sponsor-reveal]", {
+      y: 24,
+      opacity: 0.35,
+      duration: 0.7,
+      ease: "power3.out",
+      clearProps: "transform,opacity",
+      scrollTrigger: { trigger: "[data-sponsor-reveal]", start: "top 92%", once: true },
+    });
     gsap.from(".hanko", {
       scale: 2.2,
       opacity: 0,

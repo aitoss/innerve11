@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { EVENT } from "@/data/event";
 
 export interface NavSection {
   id: string;
@@ -31,7 +32,7 @@ export const MENU_SECTIONS: NavSection[] = [
     subtitle: "Set Your Heart Ablaze",
     desc: "Kick off the ultimate 24-hour hackathon journey. Set your heart ablaze alongside hundreds of passionate developers at AIT Pune.",
     image: "/assets/img/chars/rengoku.webp",
-    highlights: ["30–31 Jan 2027", "AIT Pune", "24h Hackathon", "OSS Club"],
+    highlights: [EVENT.dates, "AIT Pune", "24h Hackathon", "OSS Club"],
     accent: "from-[#ff2a48] via-[#ea6a1c] to-[#f6bd33]",
     glowColor: "rgba(234, 106, 28, 0.2)",
     tag: "HERO CHAPTER",
@@ -654,7 +655,7 @@ export default function MenuModal({
         <div className="hidden md:block">
           Use <kbd className="rounded bg-coat/10 px-1.5 py-0.5 text-coat font-mono">↑</kbd> <kbd className="rounded bg-coat/10 px-1.5 py-0.5 text-coat font-mono">↓</kbd> to explore · <kbd className="rounded bg-coat/10 px-1.5 py-0.5 text-coat font-mono">Enter</kbd> to jump · <kbd className="rounded bg-coat/10 px-1.5 py-0.5 text-coat font-mono">Esc</kbd> to close
         </div>
-        <div>30–31 Jan 2027</div>
+        <div>{EVENT.dates}</div>
       </footer>
     </div>,
     document.body

@@ -1,10 +1,10 @@
 import type { FaqItem } from "@/types/content";
+import { EVENT } from "@/data/event";
 
 export const faqCategories = ["General", "Registration", "Stay & Travel"] as const;
 
 export type FaqCategory = (typeof faqCategories)[number];
 
-/** Verbatim content from the static build's data.js → faq. */
 export const faq: Record<FaqCategory, FaqItem[]> = {
   General: [
     {
@@ -17,7 +17,7 @@ export const faq: Record<FaqCategory, FaqItem[]> = {
     },
     {
       q: "What are the different phases of the hackathon?",
-      a: "Idea Pitching: 15th Dec 2026 - 8th Jan 2027, and the 24-hrs Hackathon: 30th - 31st Jan 2027.",
+      a: `Idea Pitching: 15th Dec 2026 - 8th Jan 2027, and the 24-hrs Hackathon: ${EVENT.dates}.`,
     },
     {
       q: "What kind of prizes can participants expect?",
@@ -39,7 +39,7 @@ export const faq: Record<FaqCategory, FaqItem[]> = {
     },
     {
       q: "What are the dates of Phase 1 & 2?",
-      a: "Idea Pitching: 15th Dec 2026 - 8th Jan 2027 & 24-hrs Hackathon: 30th - 31st Jan 2027.",
+      a: `Idea Pitching: 15th Dec 2026 - 8th Jan 2027 & 24-hrs Hackathon: ${EVENT.dates}.`,
     },
   ],
   "Stay & Travel": [

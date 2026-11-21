@@ -1,4 +1,5 @@
 import { SPONSORS, SPONSOR_FORM_URL } from "@/data/sponsors";
+import "./sponsors.css";
 
 interface SponsorsProps {
   formUrl?: string;
@@ -10,7 +11,7 @@ export default function Sponsors({ formUrl = SPONSOR_FORM_URL }: SponsorsProps) 
       id="allies"
       data-tone="light"
       data-name="Allies"
-      className="allies paper paper-grain pb-[clamp(80px,10vw,150px)] pt-[clamp(60px,8vw,110px)]"
+      className="allies paper paper-grain pb-[clamp(32px,4vw,56px)] pt-[clamp(60px,8vw,110px)]"
     >
       <div className="wrap mx-auto w-[min(1320px,100%)] px-gut">
         <div className="eyebrow mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.28em] opacity-80">
@@ -52,24 +53,23 @@ export default function Sponsors({ formUrl = SPONSOR_FORM_URL }: SponsorsProps) 
         </div>
 
         {/* Want to Sponsor Us Banner */}
-        <div className="mt-4 flex items-center justify-between gap-6 border border-ink/15 bg-card px-8 py-6 max-[640px]:flex-col max-[640px]:items-start max-[640px]:p-5">
-          <h3 className="font-display text-[clamp(24px,2.8vw,38px)] uppercase tracking-[-0.01em] text-ink leading-none">
-            Want to sponsor us?
-          </h3>
-          <a
-            href={formUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex shrink-0 items-center justify-center gap-2.5 bg-red px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-red2 hover:shadow-[0_4px_20px_rgba(200,16,46,0.35)] active:scale-[0.98] max-[640px]:w-full"
-          >
-            <span>Fill the form</span>
-            <span
-              className="text-base leading-none transition-transform duration-300 group-hover:translate-x-1"
-              aria-hidden="true"
+        <div data-sponsor-reveal className="mt-4">
+          <div className="sponsor-cta flex items-center justify-between gap-6 border border-ink/15 bg-card px-8 py-6 max-[640px]:flex-col max-[640px]:items-start max-[640px]:p-5">
+            <h3 className="font-display text-[clamp(24px,2.8vw,38px)] uppercase tracking-[-0.01em] text-ink leading-none">
+              Want to sponsor us?
+            </h3>
+            <a
+              href={formUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sponsor-cta__btn inline-flex shrink-0 items-center justify-center gap-2.5 bg-red px-7 py-3 text-sm font-semibold text-white hover:bg-red2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-red max-[640px]:w-full"
             >
-              &rarr;
-            </span>
-          </a>
+              <span>Fill the form</span>
+              <span className="sponsor-cta__arrow text-base leading-none" aria-hidden="true">
+                &rarr;
+              </span>
+            </a>
+          </div>
         </div>
       </div>
     </section>

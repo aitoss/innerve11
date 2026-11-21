@@ -31,6 +31,6 @@ export const NIGHT_GATES: NightGateSeed[] = [
   { k: "壱", n: "01", day: "15 NOV", yr: "2026", what: "Registration starts", at: "12:00 AM IST", z: -12, fy: CASTLE_FLOOR_A },
   { k: "弐", n: "02", day: "31 DEC", yr: "2026", what: "Registration ends", at: "11:59 PM IST", z: -62, fy: CASTLE_FLOOR_A },
   { k: "参", n: "03", day: "08 JAN", yr: "2027", what: "Shortlisted teams announced", at: "", z: -124, fy: CASTLE_FLOOR_A },
-  { k: "肆", n: "04", day: "30 JAN", yr: "2027", what: "Hackathon begins", at: "24-hour coding marathon", z: -148, fy: CASTLE_FLOOR_A },
-  { k: "伍", n: "05", day: "31 JAN", yr: "2027", what: "Results announced", at: "", z: -178, fy: CASTLE_FLOOR_A },
+  { k: "肆", n: "04", day: "29 JAN", yr: "2027", what: "Hackathon begins", at: "24-hour coding marathon", z: -148, fy: CASTLE_FLOOR_A },
+  { k: "伍", n: "05", day: "30 JAN", yr: "2027", what: "Results announced", at: "", z: -178, fy: CASTLE_FLOOR_A },
 ];
