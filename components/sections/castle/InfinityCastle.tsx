@@ -2,14 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { UPPER_MOONS } from "@/data/castle";
+import { NIGHT_GATES } from "@/data/castle";
 import type { CastleGate } from "@/types/content";
 
 export default function InfinityCastle() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const capRef = useRef<HTMLDivElement>(null);
   const nightRef = useRef<HTMLDivElement>(null);
-  const [moon, setMoon] = useState(-1);
+  const [staticTimeline, setStaticTimeline] = useState(false);
   const [night, setNight] = useState<CastleGate | null>(null);
   const [gates, setGates] = useState<CastleGate[]>([]);
   const gatesRef = useRef<CastleGate[]>([]);
@@ -17,7 +16,6 @@ export default function InfinityCastle() {
   /* Castle HUD listeners — registered before the castle module starts so the
      start-time `castle-gates` event is not missed. */
   useEffect(() => {
-    const onMoon = (e: Event) => setMoon((e as CustomEvent<number>).detail);
     const onNight = (e: Event) => {
       const i = (e as CustomEvent<number>).detail;
       setNight(i < 0 ? null : gatesRef.current[i] ?? null);
@@ -25,28 +23,16 @@ export default function InfinityCastle() {
     const onGates = (e: Event) => {
       const list = (e as CustomEvent<CastleGate[]>).detail;
       gatesRef.current = list;
+      setNight(null);
       setGates(list);
     };
-    window.addEventListener("castle-moon", onMoon);
     window.addEventListener("castle-night", onNight);
     window.addEventListener("castle-gates", onGates);
     return () => {
-      window.removeEventListener("castle-moon", onMoon);
       window.removeEventListener("castle-night", onNight);
       window.removeEventListener("castle-gates", onGates);
     };
   }, []);
-
-  /* Moon caption slide-in/out */
-  useEffect(() => {
-    const el = capRef.current;
-    if (!el) return;
-    if (moon < 0) {
-      gsap.to(el, { opacity: 0, x: 20, duration: 0.3 });
-    } else {
-      gsap.fromTo(el, { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" });
-    }
-  }, [moon]);
 
   /* Night gate card rise/settle */
   useEffect(() => {
@@ -61,31 +47,78 @@ export default function InfinityCastle() {
 
   /* 3D flythrough */
   useEffect(() => {
-    let stopCastle: (() => void) | undefined;
-    let cancelled = false;
     const canvas = canvasRef.current;
-    if (canvas) {
-      import("@/lib/castle").then((m) => {
-        if (cancelled) return;
-        stopCastle = m.startCastle(canvas);
-      });
-    }
-    return () => {
-      cancelled = true;
+    if (!canvas) return;
+    const motion = matchMedia("(prefers-reduced-motion: reduce)");
+    let stopCastle: (() => void) | undefined;
+    let generation = 0;
+
+    const stop = () => {
+      generation++;
       stopCastle?.();
+      stopCastle = undefined;
+    };
+    const sync = async () => {
+      stop();
+      const attempt = generation;
+      if (motion.matches || document.documentElement.classList.contains("no-anim")) {
+        setStaticTimeline(true);
+        return;
+      }
+      try {
+        const { startCastle } = await import("@/lib/castle");
+        if (attempt !== generation) return;
+        stopCastle = startCastle(canvas);
+        setStaticTimeline(!stopCastle);
+      } catch (error) {
+        if (attempt !== generation) return;
+        console.warn("Castle renderer unavailable, displaying the timeline.", error);
+        setStaticTimeline(true);
+      }
+    };
+    const onContextLost = (event: Event) => {
+      event.preventDefault();
+      stop();
+      setStaticTimeline(true);
+    };
+    void sync();
+    motion.addEventListener("change", sync);
+    canvas.addEventListener("webglcontextlost", onContextLost);
+    canvas.addEventListener("webglcontextrestored", sync);
+    return () => {
+      motion.removeEventListener("change", sync);
+      canvas.removeEventListener("webglcontextlost", onContextLost);
+      canvas.removeEventListener("webglcontextrestored", sync);
+      stop();
     };
   }, []);
 
-  const activeMoon = moon >= 0 ? UPPER_MOONS[moon] : null;
+  useEffect(() => {
+    window.dispatchEvent(new Event("castle-layout"));
+  }, [staticTimeline]);
 
   return (
     <section
       id="castle"
       data-tone="dark"
+      data-static={staticTimeline}
       data-name="Infinity Castle"
       className="castle relative z-[5] overflow-hidden rounded-t-[clamp(22px,3vw,44px)] bg-[#0c0508] shadow-[0_-24px_60px_rgba(0,0,0,.5)]"
     >
-      <div className="castle__stage svh relative overflow-hidden">
+      {staticTimeline && (
+        <div className="mx-auto max-w-4xl px-gut py-16 text-paper">
+          <h2 className="mb-8 font-display text-6xl uppercase">Timeline</h2>
+          <ol className="divide-y divide-paper/20">
+            {NIGHT_GATES.map((gate) => (
+              <li key={gate.n} className="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+                <span className="font-semibold text-amber">{gate.day} {gate.yr}</span>
+                <div>{gate.what}{gate.at && <span className="block text-sm text-paper/70">{gate.at}</span>}</div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+      <div hidden={staticTimeline} className="castle__stage svh relative overflow-hidden">
         <canvas
           ref={canvasRef}
           id="castleGL"
@@ -102,16 +135,6 @@ export default function InfinityCastle() {
           <p className="castle__sub mt-[18px] max-w-[44ch] opacity-[.85] max-[430px]:text-sm max-[430px]:max-w-[90%]">
             Every room is a problem statement. Six Upper Moons stand between you and dawn.
           </p>
-        </div>
-        <div
-          ref={capRef}
-          id="castleCap"
-          className="castle__cap absolute bottom-[14vh] right-gut z-[2] text-right opacity-0 max-[640px]:bottom-[8vh]"
-        >
-          {activeMoon && (
-            <>
-            </>
-          )}
         </div>
         <div
           ref={nightRef}
