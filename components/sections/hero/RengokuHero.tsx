@@ -335,16 +335,16 @@ export default function RengokuHero() {
         {/* ---------- band copy + CTA (above every animated layer) ---------- */}
         <div className="flame-band flame-bandCopy absolute inset-x-0 bottom-0 z-[6] flex px-gut text-haori lg:justify-between lg:gap-8">
           <div className="rz-bandL re-band max-w-[30ch] text-left">
-            <p className="text-[clamp(13px,1vw,15px)] max-[430px]:text-[12px] leading-[1.55] text-haori/80">
+            <p className="text-[clamp(13px,1vw,15px)] max-[430px]:text-[12px] leading-[1.55] text-haori/80 max-sm:hidden">
               India&apos;s largest student-driven hackathon. Twenty-four hours inside the Infinity Castle.
             </p>
             <Countdown />
           </div>
           <a href="#castle" data-scroll className="re-band group block text-right max-lg:text-left">
-            <span className="block text-[clamp(12px,1.05vw,15px)] max-[430px]:text-[11px] font-medium uppercase tracking-[0.18em] text-haori/80">
+            <span className="block text-[clamp(12px,1.05vw,15px)] max-sm:text-[12px] font-medium uppercase tracking-[0.18em] text-haori/80">
               {REG.title} · {REG.date}
             </span>
-            <span className="mt-1 flex items-center gap-3 font-body text-[clamp(28px,3.1vw,50px)] max-[430px]:text-[clamp(20px,5.5vw,26px)] font-extrabold uppercase leading-[1] tracking-[-0.02em] text-ember lg:justify-end">
+            <span className="mt-1 flex items-center gap-3 font-body text-[clamp(28px,3.1vw,50px)] max-sm:text-[clamp(23px,6vw,28px)] font-extrabold uppercase leading-[1] tracking-[-0.02em] text-ember lg:justify-end">
               <span className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_2px] bg-left-bottom bg-no-repeat pb-1 transition-[background-size] duration-500 group-hover:bg-[length:100%_2px]">
                 Enter the castle
               </span>
