@@ -20,12 +20,6 @@ export default function Site() {
 
   return (
     <>
-      <div
-        id="flash"
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-[58] bg-white opacity-0"
-      />
-
       <main id="smooth">
         <RengokuHero />
         <Tracks />

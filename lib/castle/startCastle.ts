@@ -1,6 +1,6 @@
 // @ts-nocheck
 /* Innerve 11 — Infinity Castle (無限城) v2.
-   Behavior-frozen Three.js flythrough wrapped in a start/dispose lifecycle.
+   Scroll-driven Three.js flythrough, with a shared route for the camera and scenery.
    The scroll driver (lib/scroll/driver.ts) pins #castle and writes window.CASTLE.progress (0..1).
    This renders, fires biwa "shifts" that rearrange the castle, and emits
    `castle-moon` / `castle-night` / `castle-gates` / `castle-shift` events
@@ -12,6 +12,7 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { gsap } from "gsap";
+import { BEND_Z, distanceToRide, ENTRANCE_Z, EXIT_Z, EYE_HEIGHT, routeFraction, routePoint, turnAngle } from "./route";
 import {
   CASTLE_FLOOR_A,
   NIGHT_GATES,
@@ -28,7 +29,7 @@ import {
   plateTex,
 } from "@/lib/castle/textures";
 
-export function startCastle(host: HTMLCanvasElement): () => void {
+export function startCastle(host: HTMLCanvasElement): (() => void) | undefined {
   let disposed = false;
   let rafId = 0;
 
@@ -37,7 +38,10 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   const mobile = innerWidth < 700;
   const level = () => (window.SFX && window.SFX.level ? window.SFX.level() : 0);
 
-  const renderer = new THREE.WebGLRenderer({ canvas: host, antialias: !mobile, powerPreference: "high-performance" });
+  const attributes: WebGLContextAttributes = { antialias: !mobile, powerPreference: "high-performance" };
+  const context = host.getContext("webgl2", attributes) ?? host.getContext("webgl", attributes);
+  if (!context) return;
+  const renderer = new THREE.WebGLRenderer({ canvas: host, context, ...attributes });
   const DPR_MAX = Math.min(devicePixelRatio, mobile ? 1.25 : 1.5);
   let dpr = DPR_MAX;
   renderer.setPixelRatio(dpr);
@@ -59,7 +63,8 @@ export function startCastle(host: HTMLCanvasElement): () => void {
 
   /* ---------- textures ---------- */
   const shojiTex = canvasTex(256, 384, drawShoji);
-  const shojiTall = canvasTex(256, 384, drawShoji, [3, 14]);
+  const shaftBays = 20;
+  const shaftPaper = canvasTex(256, 384, drawShoji, [2, shaftBays]);
   const woodTex = canvasTex(256, 256, drawWood, [1, 8]);
   const tatamiTex = canvasTex(128, 256, drawTatami);
 
@@ -67,7 +72,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   // Lambert keeps per-pixel cost low; everything static is merged below into a few draw calls
   const M = {
     shoji: new THREE.MeshLambertMaterial({ map: shojiTex, emissive: new THREE.Color("#ff9d4a"), emissiveMap: shojiTex, emissiveIntensity: 0.45, side: THREE.DoubleSide }),
-    shojiTall: new THREE.MeshLambertMaterial({ map: shojiTall, emissive: new THREE.Color("#ff8a3a"), emissiveMap: shojiTall, emissiveIntensity: 0.45, side: THREE.DoubleSide }),
+    shaftWall: new THREE.MeshLambertMaterial({ color: "#e5aa75", map: shaftPaper, emissive: "#ff983e", emissiveMap: shaftPaper, emissiveIntensity: 0.65 }),
     wood: new THREE.MeshLambertMaterial({ map: woodTex }),
     beam: new THREE.MeshLambertMaterial({ color: "#1d0d08" }),
     red: new THREE.MeshLambertMaterial({ color: "#8e0a1f", emissive: new THREE.Color("#3a0008") }),
@@ -103,12 +108,21 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   /* ---------- architecture ---------- */
   const world = new THREE.Group();
   scene.add(world);
-  const corridor = (z0, z1, fy) => {
-    const len = z0 - z1;
-    const floor = box(6, 0.4, len, M.wood);
-    floor.position.set(0, fy, (z0 + z1) / 2);
-    world.add(floor);
-    for (let z = z0 - 2, i = 0; z > z1; z -= 10, i++) {
+  const lip = BEND_Z + 3;
+  const floor = box(6, 0.4, 10 - lip, M.wood);
+  floor.position.set(0, CASTLE_FLOOR_A, (10 + lip) / 2);
+  world.add(floor);
+
+  // Build the shaft in corridor coordinates, then tip the whole frame down.
+  const shaft = new THREE.Group();
+  shaft.rotation.x = -Math.PI / 2;
+  shaft.position.copy(routePoint(0, 0, EXIT_Z));
+  shaft.translateZ(-EXIT_Z);
+  world.add(shaft);
+
+  {
+    const fy = CASTLE_FLOOR_A;
+    for (let z = 8, i = 0; z > lip; z -= 10, i++) {
       [-3.1, 3.1].forEach((x) => {
         const p = box(0.45, 6.4, 0.45, M.beam);
         p.position.set(x, fy + 3, z);
@@ -122,9 +136,6 @@ export function startCastle(host: HTMLCanvasElement): () => void {
       world.add(lin2);
       const side = i % 2 ? 1 : -1;
       for (let k = 0; k < 2; k++) {
-        // the right-hand panel pair beside the final doors was removed on
-        // request: it read as a stray wall jutting out at the end of the route
-        if (side === 1 && z - 2.2 - k * 2.6 < -204) continue;
         const s = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 5.4), M.shoji);
         s.position.set(side * 3.05, fy + 2.75, z - 2.2 - k * 2.6);
         s.rotation.y = (side * Math.PI) / 2;
@@ -132,9 +143,63 @@ export function startCastle(host: HTMLCanvasElement): () => void {
       }
       lantern(-side * 2.4, fy + 4.8, z - 5, world);
     }
-  };
-  // one straight corridor the whole way: the undated shaft drop was removed on request
-  corridor(10, -222, CASTLE_FLOOR_A);
+  }
+
+  // Four inward-facing sheets meet at the corners. The paper lattice repeats
+  // along each sheet, so the walls stay continuous between the timber frames.
+  {
+    const width = 9;
+    const half = width / 2;
+    const top = BEND_Z + CASTLE_FLOOR_A + 0.2 - EYE_HEIGHT;
+    const bottom = -222;
+    const length = top - bottom;
+    const middle = (top + bottom) / 2;
+    const wall = new THREE.PlaneGeometry(width, length);
+    wall.rotateX(-Math.PI / 2);
+    wall.translate(0, -half, 0);
+    for (let side = 0; side < 4; side++) {
+      const panel = new THREE.Mesh(wall, M.shaftWall);
+      panel.rotation.z = side * Math.PI / 2;
+      panel.position.set(0, EYE_HEIGHT, middle);
+      shaft.add(panel);
+    }
+
+    const timber = 0.22;
+    const edge = half - timber / 2;
+    for (const x of [-edge, edge]) {
+      for (const y of [-edge, edge]) {
+        const post = box(timber, timber, length, M.beam);
+        post.position.set(x, EYE_HEIGHT + y, middle);
+        shaft.add(post);
+      }
+    }
+
+    const span = width - 2 * timber;
+    for (let bay = 0; bay <= shaftBays; bay++) {
+      const z = top - length * bay / shaftBays;
+      for (const offset of [-edge, edge]) {
+        const across = box(span, timber, 0.32, M.beam);
+        across.position.set(0, EYE_HEIGHT + offset, z);
+        shaft.add(across);
+        const upright = box(timber, span, 0.32, M.beam);
+        upright.position.set(offset, EYE_HEIGHT, z);
+        shaft.add(upright);
+      }
+      if (bay === 0) {
+        for (const x of [-2.6, 2.6]) lantern(x, EYE_HEIGHT + half - 0.5, z, shaft);
+      } else if (bay % 2 === 1) {
+        const side = bay % 4 === 1 ? 1 : -1;
+        lantern(side * (half - 0.4), EYE_HEIGHT + side * 1.8, z, shaft);
+      }
+    }
+  }
+  // Two lights mark the edge. The space below is open for the descent.
+  for (const x of [-2.8, 2.8]) {
+    const post = box(0.28, 1.2, 0.28, M.beam);
+    post.position.set(x, CASTLE_FLOOR_A + 0.66, lip + 0.3);
+    world.add(post);
+    lantern(x, CASTLE_FLOOR_A + 1.55, lip + 0.3, world);
+  }
 
   /* ---------- bake the static architecture: one draw call per material ---------- */
   {
@@ -156,38 +221,14 @@ export function startCastle(host: HTMLCanvasElement): () => void {
      "shift" re-places them with a smooth tween instead of popping them in and out. */
   const rooms = new THREE.Group();
   scene.add(rooms);
-  rooms.position.set(0, -20, -105);
   const rnd = (a, b) => a + Math.random() * (b - a);
   const roomMats = [M.shoji, M.wood, M.tatami, M.beam, M.red];
   const perMat = mobile ? 22 : 44;
   const boxGeo = new THREE.BoxGeometry(1, 1, 1);
   const instanced = [];
   const dummy = new THREE.Object3D();
-  let tubePts = null; // filled once the camera path exists (below)
-  // distance from a world-space point to the camera path (Infinity before the path exists)
-  const tubeDist = (wx, wy, wz) => {
-    if (!tubePts) return Infinity;
-    let best = Infinity;
-    for (let i = 0; i < tubePts.length; i++) {
-      const p = tubePts[i];
-      const dx = p.x - wx;
-      const dy = p.y - wy;
-      const dz = p.z - wz;
-      const d2 = dx * dx + dy * dy + dz * dz;
-      if (d2 < best) best = d2;
-    }
-    return Math.sqrt(best);
-  };
-  const clearOfTube = (px, py, pz, radius) => {
-    if (!tubePts) return true;
-    return tubeDist(px + rooms.position.x, py + rooms.position.y, pz + rooms.position.z) >= radius + 8;
-  };
   // encounter anchors (world coords): floating rooms must never cover a character
-  const anchors = UPPER_MOONS.concat(ROUTE_EXTRAS).map((m) => ({
-    x: m.x,
-    y: m.fy + m.height / 2 + 0.2,
-    z: m.z,
-  }));
+  const anchors = UPPER_MOONS.concat(ROUTE_EXTRAS).map((m) => routePoint(m.x, m.fy + m.height / 2 + 0.2, m.z));
   const clearOfDemons = (wx, wy, wz, radius) => {
     const need = radius + 10;
     for (const a of anchors) {
@@ -201,13 +242,13 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   // the right-hand side of the terminal approach (final doors at z=-208):
   // keep big room faces out of the end view's right half so only the authored
   // doors and corridor remain there. Front (doors) and left side untouched.
-  const END = { x0: 2, x1: 16, y0: CASTLE_FLOOR_A - 5.8, y1: CASTLE_FLOOR_A + 12.2, z0: -186, z1: -224 };
+  const endClearance = new THREE.Box3().setFromPoints([
+    routePoint(2, CASTLE_FLOOR_A - 5.8, -186),
+    routePoint(16, CASTLE_FLOOR_A + 12.2, -224),
+  ]);
+  const clearancePoint = new THREE.Vector3();
   const clearOfEnd = (wx, wy, wz, radius) => {
-    const cx = Math.max(END.x0, Math.min(END.x1, wx));
-    const cy = Math.max(END.y0, Math.min(END.y1, wy));
-    const cz = Math.max(END.z1, Math.min(END.z0, wz));
-    const dx = wx - cx, dy = wy - cy, dz = wz - cz;
-    return dx * dx + dy * dy + dz * dz >= radius * radius;
+    return endClearance.distanceToPoint(clearancePoint.set(wx, wy, wz)) >= radius;
   };
   // oriented-box overlap (SAT, Gottschalk): true when the two boxes interpenetrate
   const qAxes = (q) => {
@@ -254,7 +295,6 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   };
   // near the route, a new room must not interpenetrate an already-placed one
   const clearOfRooms = (px, py, pz, q, s) => {
-    const c1x = px + rooms.position.x, c1y = py + rooms.position.y, c1z = pz + rooms.position.z;
     const e1 = [s.x / 2, s.y / 2, s.z / 2];
     const r1 = Math.hypot(e1[0], e1[1], e1[2]);
     let a1 = null;
@@ -266,9 +306,9 @@ export function startCastle(host: HTMLCanvasElement): () => void {
         if (!c || c.s.x === 0) continue;
         const e2 = [c.s.x / 2, c.s.y / 2, c.s.z / 2];
         const r2 = Math.hypot(e2[0], e2[1], e2[2]);
-        const tx = c.p.x + rooms.position.x - c1x;
-        const ty = c.p.y + rooms.position.y - c1y;
-        const tz = c.p.z + rooms.position.z - c1z;
+        const tx = c.p.x - px;
+        const ty = c.p.y - py;
+        const tz = c.p.z - pz;
         if (Math.hypot(tx, ty, tz) > r1 + r2) continue;
         if (!a1) a1 = qAxes(q);
         if (obbOverlap(a1, e1, qAxes(c.q), e2, [tx, ty, tz])) return false;
@@ -279,19 +319,19 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   // a biwa shift glides rooms to new slots: the glide path must not sweep
   // through the camera corridor or across a character
   const clearGlide = (fromSlot, t, bound) => {
-    const fBound = Math.max(bound, fromSlot.s.length() * 0.5);
-    const fwx = fromSlot.p.x + rooms.position.x;
-    const fwy = fromSlot.p.y + rooms.position.y;
-    const fwz = fromSlot.p.z + rooms.position.z;
     const dwx = t.p.x - fromSlot.p.x;
     const dwy = t.p.y - fromSlot.p.y;
     const dwz = t.p.z - fromSlot.p.z;
-    for (let k = 1; k < 10; k++) {
-      const e = k / 10;
-      const x = fwx + dwx * e;
-      const y = fwy + dwy * e;
-      const z = fwz + dwz * e;
-      if (tubeDist(x, y, z) < fBound + 8) return false;
+    const length = Math.hypot(dwx, dwy, dwz);
+    const steps = Math.max(1, Math.ceil(length / 6));
+    // Each midpoint covers half a step on either side, including between samples.
+    const fBound = Math.max(bound, fromSlot.s.length() * 0.5) + length / (2 * steps);
+    for (let k = 0; k < steps; k++) {
+      const e = (k + 0.5) / steps;
+      const x = fromSlot.p.x + dwx * e;
+      const y = fromSlot.p.y + dwy * e;
+      const z = fromSlot.p.z + dwz * e;
+      if (distanceToRide(x, y, z) < fBound + 8) return false;
       if (!clearOfDemons(x, y, z, fBound)) return false;
       if (!clearOfEnd(x, y, z, fBound)) return false;
     }
@@ -305,7 +345,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
     for (let tries = 0; tries < 40; tries++) {
       const ang = rnd(0, Math.PI * 2);
       const r = rnd(12, 70);
-      t.p.set(Math.cos(ang) * r, rnd(-80, 80), Math.sin(ang) * r * 1.8);
+      routePoint(Math.cos(ang) * r, rnd(-100, 60), -105 + Math.sin(ang) * r * 1.8, t.p);
       t.q.setFromEuler(
         new THREE.Euler(
           rnd(-0.6, 0.6) + (Math.random() < 0.25 ? Math.PI / 2 : 0),
@@ -315,17 +355,12 @@ export function startCastle(host: HTMLCanvasElement): () => void {
       );
       if (scaled) t.s.set(rnd(2, 10), rnd(0.4, 7), rnd(2, 12));
       else t.s.set(1, 1, 1);
-      const bound = scaled ? t.s.length() * 0.5 : 5;
-      const wx = t.p.x + rooms.position.x;
-      const wy = t.p.y + rooms.position.y;
-      const wz = t.p.z + rooms.position.z;
-      const dmin = tubeDist(wx, wy, wz);
+      const bound = scaled ? t.s.length() * 0.5 : 9.5;
+      const { x, y, z } = t.p;
+      const dmin = distanceToRide(x, y, z);
       if (dmin < bound + 8) continue;
-      if (scaled) {
-        if (!clearOfDemons(wx, wy, wz, bound)) continue;
-        if (!clearOfEnd(wx, wy, wz, bound)) continue;
-        if (dmin < 34 && !clearOfRooms(t.p.x, t.p.y, t.p.z, t.q, t.s)) continue;
-      }
+      if (!clearOfDemons(x, y, z, bound) || !clearOfEnd(x, y, z, bound)) continue;
+      if (scaled && dmin < 34 && !clearOfRooms(x, y, z, t.q, t.s)) continue;
       if (fromSlot && !clearGlide(fromSlot, t, bound)) continue;
       return t;
     }
@@ -369,34 +404,6 @@ export function startCastle(host: HTMLCanvasElement): () => void {
     addInst(new THREE.InstancedMesh(mergeGeometries(steps), M.wood, 22), false);
   }
 
-  /* ---------- camera path ---------- */
-  // a single straight line from the entrance to the final doors
-  const path = new THREE.CatmullRomCurve3(
-    [
-      new THREE.Vector3(0, 0.4, 9),
-      new THREE.Vector3(0, 0.4, -40),
-      new THREE.Vector3(0, 0.4, -88),
-      new THREE.Vector3(0, 0.4, -130),
-      new THREE.Vector3(0, 0.4, -170),
-      new THREE.Vector3(0, 0.4, -203),
-    ],
-    false,
-    "centripetal"
-  );
-  tubePts = path.getSpacedPoints(160);
-  // instances were placed before the path existed: re-seat any that sit inside the tube
-  instanced.forEach((inst) => {
-    for (let i = 0; i < inst.count; i++) {
-      const c = inst.userData.cur[i];
-      if (!clearOfTube(c.p.x, c.p.y, c.p.z, inst.userData.scaled ? c.s.length() * 0.5 : 5)) {
-        const t = makeSlot(inst.userData.scaled);
-        inst.userData.cur[i] = t;
-        writeSlot(inst, i, t.p, t.q, t.s);
-      }
-    }
-    inst.instanceMatrix.needsUpdate = true;
-  });
-
   /* ---------- Upper Moons — inflated 2.5D figures that turn and lunge ---------- */
   const demons = [];
   const auraTex = createAuraTexture();
@@ -404,9 +411,9 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   const addDemon = (i, { id, kanji, x, fy, z, height, onPlatform }) => {
     const g = new THREE.Group();
     // Center the art in its own encounter plane.
-    g.position.set(x, fy + height / 2 + 0.2, z);
+    routePoint(x, fy + height / 2 + 0.2, z, g.position);
     scene.add(g);
-    const d = { g, i, h: height, x0: x, y0: g.position.y, side: Math.sign(x) || 1, lunge: 0, lunged: false, turn: 0, flat: null };
+    const d = { g, i, home: g.position.clone(), pathU: routeFraction(z), side: Math.sign(x) || 1, lunge: 0, lunged: false, turn: 0, flat: null };
     demons.push(d);
     const plate = new THREE.Mesh(
       new THREE.PlaneGeometry(2.6, 0.81),
@@ -437,7 +444,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
       });
     };
     const onArt = (tex) => {
-      if (disposed) return;
+      if (disposed) { tex.dispose(); return; }
       tex.colorSpace = THREE.SRGBColorSpace;
       const a = tex.image.width / tex.image.height;
       // art that is cropped at its bottom edge (Doma) shows a hard cut: fade its lower part out
@@ -461,6 +468,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
           cx.fillRect(0, 0, im.width, im.height);
           useTex = new THREE.CanvasTexture(cv);
           useTex.colorSpace = THREE.SRGBColorSpace;
+          tex.dispose();
           d.cropped = true;
           if (d.plat) d.plat.visible = false;
         }
@@ -484,7 +492,8 @@ export function startCastle(host: HTMLCanvasElement): () => void {
     loadArt();
     if (onPlatform) {
       const p = box(1.6, 0.3, 1.6, M.red);
-      p.position.set(x, fy, z);
+      routePoint(x, fy, z, p.position);
+      p.rotation.x = -turnAngle(z);
       // dissolves like the character: a solid slab passing the lens would fill the screen
       p.material = p.material.clone();
       p.material.transparent = true;
@@ -495,32 +504,25 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   };
   UPPER_MOONS.forEach((moon, i) => addDemon(i, moon));
   ROUTE_EXTRAS.forEach((moon, k) => addDemon(UPPER_MOONS.length + k, moon));
-  // Reveal by route distance, not just straight-line distance through walls/gates.
-  demons.forEach((d) => {
-    let best = Infinity;
-    d.pathU = 0;
-    for (let j = 0; j <= 600; j++) {
-      const u = j / 600;
-      const distance = path.getPointAt(u).distanceTo(d.g.position);
-      if (distance < best) { best = distance; d.pathU = u; }
-    }
-  });
-
   /* ---------- the final doors ---------- */
   const DOOR_Z = -208;
   const DY = CASTLE_FLOOR_A + 3.2;
+  const doorway = new THREE.Group();
+  routePoint(0, DY, DOOR_Z, doorway.position);
+  doorway.rotation.x = -turnAngle(DOOR_Z);
+  scene.add(doorway);
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 6.2), new THREE.MeshBasicMaterial({ color: "#ff1030", fog: false, toneMapped: false }));
-  glow.position.set(0, DY, DOOR_Z - 0.6);
-  scene.add(glow);
+  glow.position.z = -0.6;
+  doorway.add(glow);
   const doorL = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 6), M.shoji);
-  doorL.position.set(-1.6, DY, DOOR_Z);
-  scene.add(doorL);
+  doorL.position.x = -1.6;
+  doorway.add(doorL);
   const doorR = doorL.clone();
   doorR.position.x = 1.6;
-  scene.add(doorR);
+  doorway.add(doorR);
   const df = box(7.4, 0.5, 0.5, M.red);
-  df.position.set(0, DY + 3.2, DOOR_Z);
-  scene.add(df);
+  df.position.y = 3.2;
+  doorway.add(df);
 
   /* ---------- hanging gate plaques on the way down ---------- */
   const nights = NIGHT_GATES.map((n) => ({ ...n }));
@@ -529,53 +531,52 @@ export function startCastle(host: HTMLCanvasElement): () => void {
     tex.anisotropy = 8;
     const mat = new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color(0.92, 0.92, 0.92), toneMapped: false, fog: true, transparent: true });
     const m = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 2.6), mat);
-    const y = n.fy + 4.35;
-    const gx = 0;
-    m.position.set(gx, y, n.z + 0.05);
-    scene.add(m);
+    const gate = new THREE.Group();
+    routePoint(0, n.fy + 4.35, n.z, gate.position);
+    gate.rotation.x = -turnAngle(n.z);
+    scene.add(gate);
+    m.position.z = 0.05;
+    gate.add(m);
+    const cordMat = M.beam.clone();
+    const rimMat = M.red.clone();
+    for (const trim of [cordMat, rimMat]) {
+      trim.transparent = true;
+      trim.depthWrite = false;
+    }
     [-2.3, 2.3].forEach((x) => {
-      const c = box(0.07, 1.1, 0.07, M.beam);
-      c.position.set(x, y + 1.85, n.z);
-      scene.add(c);
+      const c = box(0.07, 1.1, 0.07, cordMat);
+      c.position.set(x, 1.85, 0);
+      gate.add(c);
     });
     {
-      const rim = box(5.5, 0.14, 0.2, M.red);
-      rim.position.set(0, y - 1.35, n.z);
-      scene.add(rim);
-      const rim2 = box(5.5, 0.14, 0.2, M.red);
-      rim2.position.set(0, y + 1.35, n.z);
-      scene.add(rim2);
+      for (const y of [-1.35, 1.35]) {
+        const rim = box(5.5, 0.14, 0.2, rimMat);
+        rim.position.y = y;
+        gate.add(rim);
+      }
     }
-    n.pos = new THREE.Vector3(gx, y, n.z);
+    n.pos = gate.position;
     n.tex = tex;
-    return m;
+    return { gate, materials: [mat, cordMat, rimMat] };
   });
   // fonts load after the first paint: redraw the plaques once they are in
   if (document.fonts && document.fonts.load) {
     Promise.all(["168px Anton", "64px 'Shippori Mincho B1'", "600 30px Inter"].map((f) => document.fonts.load(f, "壱15 NOVJAN")))
-      .then(() =>
+      .then(() => {
+        if (disposed) return;
         nights.forEach((n) => {
           const c = n.tex.image;
           const g = c.getContext("2d");
           g.clearRect(0, 0, c.width, c.height);
           drawPlaque(n)(g, c.width, c.height);
           n.tex.needsUpdate = true;
-        })
-      )
+        });
+      })
       .catch(() => {});
   }
   // where on the scroll (0..1) the camera passes each gate: invert the same easing the camera uses
-  const progressAt = (pt) => {
-    let bu = 0;
-    let bd = 1e9;
-    for (let i = 0; i <= 600; i++) {
-      const u = i / 600;
-      const d = path.getPointAt(u).distanceTo(pt);
-      if (d < bd) {
-        bd = d;
-        bu = u;
-      }
-    }
+  const progressAt = (z) => {
+    const bu = routeFraction(z);
     let lo = 0;
     let hi = 0.93;
     for (let i = 0; i < 30; i++) {
@@ -586,7 +587,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
     return (lo + hi) / 2;
   };
   nights.forEach((n) => {
-    n.p = progressAt(n.pos);
+    n.p = progressAt(n.z);
   });
   state.nights = nights.map(({ k, n, day, yr, what, at, p }) => ({ k, n, day, yr, what, at, p }));
   window.dispatchEvent(new CustomEvent("castle-gates", { detail: state.nights }));
@@ -594,10 +595,9 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   /* ---------- dust ---------- */
   const dustN = mobile ? 700 : 1500;
   const dust = new Float32Array(dustN * 3);
+  const mote = new THREE.Vector3();
   for (let i = 0; i < dustN; i++) {
-    dust[i * 3] = rnd(-24, 24);
-    dust[i * 3 + 1] = rnd(-55, 15);
-    dust[i * 3 + 2] = rnd(-225, 12);
+    routePoint(rnd(-24, 24), rnd(-55, 15), rnd(-225, 12), mote).toArray(dust, i * 3);
   }
   const dg = new THREE.BufferGeometry();
   dg.setAttribute("position", new THREE.BufferAttribute(dust, 3));
@@ -607,7 +607,6 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   /* ---------- biwa shifts: the castle rearranges itself ---------- */
   const SHIFTS = nights.map((n) => ({ at: n.p + 0.01, armed: true }));
   let lastShift = 0;
-  let shaftness = 0; // 1 while falling down the shaft: its walls are bright, so shift effects are calmer there
   let shiftKick = 0;
   let shiftRaw = 0; // the kick's target: set to 1 by a shift, decays in real time
   let shiftT = 1; // 0..1 while rooms glide to their new places
@@ -624,7 +623,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
     });
     shiftT = 0;
     shiftRaw = 1;
-    window.dispatchEvent(new CustomEvent("castle-shift", { detail: { shaft: shaftness } }));
+    window.dispatchEvent(new CustomEvent("castle-shift", { detail: { shaft: 0 } }));
   };
   const glideRooms = (dt) => {
     if (shiftT >= 1) return;
@@ -651,12 +650,12 @@ export function startCastle(host: HTMLCanvasElement): () => void {
     const h = host.clientHeight || innerHeight;
     renderer.setSize(w, h, false);
     composer.setSize(w, h);
-    bloom.resolution.set(w / 2, h / 2);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
   };
   resize();
-  addEventListener("resize", resize);
+  const sizes = new ResizeObserver(resize);
+  sizes.observe(host);
 
   const mouse = { x: 0, y: 0, sx: 0, sy: 0 };
   const onPointer = (e) => {
@@ -678,23 +677,16 @@ export function startCastle(host: HTMLCanvasElement): () => void {
     ([e]) => {
       visible = e.isIntersecting;
       state.visible = visible;
+      if (visible) smooth = state.progress;
     },
     { rootMargin: "0px" }
   );
   io.observe(host);
 
   const clock = new THREE.Clock();
-  const UP = new THREE.Vector3(0, 1, 0);
-  const UP_SHAFT = new THREE.Vector3(0, 0, -1);
-  const Z = new THREE.Vector3(0, 0, 1);
-  const fwdS = new THREE.Vector3(0, 0, -1);
   const fwd = new THREE.Vector3();
-  const up = new THREE.Vector3();
   const tmp = new THREE.Vector3();
   const tmp2 = new THREE.Vector3();
-  const m4 = new THREE.Matrix4();
-  const qRoll = new THREE.Quaternion();
-  const qLook = new THREE.Quaternion();
   const smoothstep = THREE.MathUtils.smoothstep;
 
   const frame = () => {
@@ -713,72 +705,63 @@ export function startCastle(host: HTMLCanvasElement): () => void {
       if (ft > 0.026 && dpr > 0.75) {
         dpr = Math.max(0.75, dpr * 0.9);
         renderer.setPixelRatio(dpr);
+        composer.setPixelRatio(dpr);
         resize();
         frames = 0;
       } else if (ft < 0.012 && dpr < DPR_MAX) {
         dpr = Math.min(DPR_MAX, dpr * 1.05);
         renderer.setPixelRatio(dpr);
+        composer.setPixelRatio(dpr);
         resize();
         frames = 0;
       }
     }
     const p = smooth;
 
-    // biwa shifts when crossing thresholds (either direction)
-    // each shift fires once going forward; it re-arms only after you scroll well back before it
+    // Consume every crossed gate, including ones skipped in a fast scroll.
+    let crossedGate = false;
     SHIFTS.forEach((s) => {
-      if (s.armed && p >= s.at && performance.now() - lastShift > 1500) {
+      if (s.armed && p >= s.at) {
         s.armed = false;
-        lastShift = performance.now();
-        shift();
+        crossedGate = true;
       } else if (!s.armed && p < s.at - 0.06) {
         s.armed = true;
       }
     });
+    if (crossedGate && performance.now() - lastShift > 1500) {
+      lastShift = performance.now();
+      shift();
+    }
     // sudden but not a one-frame snap: the kick rises in ~40ms and decays at the same rate on any frame rate
     shiftRaw *= Math.exp(-Math.min(dtRaw, 0.25) * 5);
     shiftKick += (shiftRaw - shiftKick) * (1 - Math.exp(-Math.min(dtRaw, 0.25) * 25));
 
-    // ride the curve
-    const u = Math.min(0.999, smoothstep(p, 0, 0.93));
-    const pos = path.getPointAt(u);
-    const ahead = path.getPointAt(Math.min(u + 0.015, 1));
-    fwd.subVectors(ahead, pos).normalize();
-    fwdS.lerp(fwd, 1 - Math.exp(-Math.min(dtRaw, 0.25) * 5)).normalize();
-    fwd.copy(fwdS); // low-pass the look direction: no whip at the shaft entry
-    const vert = smoothstep(Math.abs(fwd.y), 0.5, 0.95);
-    up.copy(UP).lerp(UP_SHAFT, vert).normalize();
+    // Keep the visitor's left and right steady as the camera pitches into the shaft.
+    const u = smoothstep(p, 0, 0.93);
+    const z = THREE.MathUtils.lerp(ENTRANCE_Z, EXIT_Z, u);
+    const angle = turnAngle(z);
+    fwd.set(0, -Math.sin(angle), -Math.cos(angle));
     const kM = 1 - Math.exp(-dt * 3);
     mouse.sx += (mouse.x - mouse.sx) * kM;
     mouse.sy += (mouse.y - mouse.sy) * kM;
-    camera.position.copy(pos);
-    camera.position.x += Math.sin(p * 11) * 0.35 + mouse.sx * 1.2;
-    camera.position.y += (Math.sin(p * 15) * 0.2 - mouse.sy * 0.8) * (1 - vert);
-    tmp.copy(camera.position).add(fwd);
-    m4.lookAt(camera.position, tmp, up);
-    qLook.setFromRotationMatrix(m4);
-    shaftness = smoothstep(-camera.position.y, 4, 10) * (1 - smoothstep(-camera.position.y, 20, 28));
-    const roll = Math.sin(p * Math.PI * 2.4) * 0.1 + vert * Math.sin(t * 0.8) * 0.16 + shiftKick * 0.1 * (1 - 0.6 * shaftness);
-    qRoll.setFromAxisAngle(Z, roll);
-    camera.quaternion.copy(qLook).multiply(qRoll);
-    camera.rotateY(-mouse.sx * 0.22);
-    camera.rotateX(-mouse.sy * 0.12);
+    routePoint(Math.sin(p * 11) * 0.28 + mouse.sx, EYE_HEIGHT + Math.sin(p * 15) * 0.14 - mouse.sy * 0.6, z, camera.position);
+    camera.rotation.set(-angle - mouse.sy * 0.12, -mouse.sx * 0.18, shiftKick * 0.018, "XYZ");
     const baseFov = camera.aspect < 0.8 ? 80 : 64;
-    camera.fov += (baseFov + vert * 10 + shiftKick * 6 * (1 - 0.6 * shaftness) - camera.fov) * (1 - Math.exp(-dt * 6));
+    camera.fov += (baseFov + shiftKick * 2 - camera.fov) * (1 - Math.exp(-dt * 6));
     camera.updateProjectionMatrix();
     camLight.position.copy(camera.position).addScaledVector(fwd, 3);
 
     // world motion
     glideRooms(dt);
     M.lantern.emissiveIntensity = 2 + Math.sin(t * 9) * 0.25 + Math.sin(t * 23) * 0.15 + lv * 1.5;
-    M.shoji.emissiveIntensity = M.shojiTall.emissiveIntensity = 0.42 + lv * 0.3 + shiftKick * 0.35 * (1 - 0.7 * shaftness);
+    M.shoji.emissiveIntensity = 0.42 + lv * 0.3 + shiftKick * 0.15;
     dustMat.size = 0.08 + lv * 0.12;
 
     // demons: billboards that face you, glow and lunge when close
     let near = -1;
     let nd = 1e9;
     demons.forEach((d) => {
-      const dist = camera.position.distanceTo(d.g.position);
+      const dist = camera.position.distanceTo(d.home);
       if (dist > 80) {
         d.g.visible = false;
         return;
@@ -805,8 +788,9 @@ export function startCastle(host: HTMLCanvasElement): () => void {
         gsap.timeline().to(d, { lunge: 1, duration: 0.22, ease: "power3.out" }).to(d, { lunge: 0, duration: 0.9, ease: "power2.inOut" });
       }
       if (dist > 45) d.lunged = false;
-      tmp.copy(camera.position).sub(d.g.position).normalize();
-      d.g.position.set(d.x0, d.y0 + Math.sin(t * 1.4 + d.i) * 0.08, d.g.position.z).addScaledVector(tmp, d.lunge * 1.6);
+      tmp.copy(camera.position).sub(d.home).normalize();
+      d.g.position.copy(d.home).addScaledVector(tmp, d.lunge * 1.6);
+      d.g.translateY(Math.sin(t * 1.4 + d.i) * 0.08);
       d.aura.material.opacity = o * (0.3 + lv * 0.5 + d.lunge * 0.8 + Math.sin(t * 3 + d.i) * 0.08);
       d.aura.scale.setScalar(1 + d.lunge * 0.4 + Math.sin(t * 2 + d.i) * 0.04);
       if (d.i < UPPER_MOONS.length && dist < 24 && dist < nd && tmp.subVectors(d.g.position, camera.position).dot(fwd) > -3) {
@@ -824,7 +808,7 @@ export function startCastle(host: HTMLCanvasElement): () => void {
       window.dispatchEvent(new CustomEvent("castle-moon", { detail: moon }));
     }
     if (near >= 0) {
-      demonLight.position.copy(demons.find((d) => d.i === near).g.position).add(tmp2.set(0, 1, 2));
+      demonLight.position.copy(demons[near].g.position).add(tmp2.set(0, 1, 2).applyQuaternion(camera.quaternion));
       demonLight.intensity += (9 - demonLight.intensity) * 0.1;
     } else {
       demonLight.intensity *= 0.9;
@@ -850,10 +834,11 @@ export function startCastle(host: HTMLCanvasElement): () => void {
       window.dispatchEvent(new CustomEvent("castle-night", { detail: curNight }));
     }
     // gate plaques sway a hair
-    plaques.forEach((m, i) => {
-      m.rotation.z = Math.sin(t * 0.9 + i * 2) * 0.008;
-      // dissolve before the camera passes it (an opaque plaque at close range fills a portrait screen)
-      m.material.opacity = smoothstep(camera.position.distanceTo(m.position), 6.0, 9.0);
+    plaques.forEach(({ gate, materials }, i) => {
+      gate.rotation.z = Math.sin(t * 0.9 + i * 2) * 0.008;
+      const opacity = smoothstep(camera.position.distanceTo(gate.position), 6, 9);
+      gate.visible = opacity > 0;
+      materials.forEach((material) => { material.opacity = opacity; });
     });
 
     // doors
@@ -862,8 +847,8 @@ export function startCastle(host: HTMLCanvasElement): () => void {
     doorR.position.x = 1.6 + open * 3.4;
     scene.fog.density = 0.026 - open * 0.012;
 
-    bloom.strength = 0.55 + lv * 0.6 + shiftKick * 0.8 * (1 - 0.7 * shaftness) + open * 0.5;
-    renderer.toneMappingExposure = 1 + shiftKick * 0.35 * (1 - 0.7 * shaftness);
+    bloom.strength = 0.55 + lv * 0.6 + shiftKick * 0.3 + open * 0.35;
+    renderer.toneMappingExposure = 1 + shiftKick * 0.1;
     composer.render();
   };
   rafId = requestAnimationFrame(frame);
@@ -871,10 +856,26 @@ export function startCastle(host: HTMLCanvasElement): () => void {
   return () => {
     disposed = true;
     cancelAnimationFrame(rafId);
-    demons.forEach((d) => clearTimeout(d.artTimer)); // pending art retries no-op on the disposed scene
-    removeEventListener("resize", resize);
+    demons.forEach((d) => {
+      clearTimeout(d.artTimer);
+      gsap.killTweensOf(d);
+    });
+    sizes.disconnect();
     removeEventListener("pointermove", onPointer);
     io.disconnect();
+    state.visible = false;
+    state.info = undefined;
+    const resources = new Set();
+    scene.traverse((object) => {
+      if (!object.geometry) return;
+      resources.add(object.geometry);
+      if (object.isInstancedMesh) object.dispose();
+      resources.add(object.material);
+      if (object.material.map) resources.add(object.material.map);
+    });
+    resources.forEach((resource) => resource.dispose());
+    composer.passes.forEach((pass) => pass.dispose());
+    composer.dispose();
     renderer.dispose();
   };
 }

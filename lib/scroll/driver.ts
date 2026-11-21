@@ -85,18 +85,9 @@ export function initDriver(): () => void {
     });
     bindAnchors(lenis);
 
-    const flash = (o = 0.6) =>
-      gsap.fromTo(
-        "#flash",
-        { opacity: o },
-        { opacity: 0, duration: 0.45, ease: "power2.out", overwrite: true }
-      );
-
     /* ----- INFINITY CASTLE (3D in lib/castle/; this drives it) ----- */
     const CASTLE = (window.CASTLE = window.CASTLE || { progress: 0 });
     const barEl = $("#castleBar");
-    // room rearrangements no longer flash a grey wash over the screen: the rooms glide on their own
-    void SFX;
 
     const castleTl = gsap.timeline({
       scrollTrigger: {
@@ -117,8 +108,22 @@ export function initDriver(): () => void {
       .to(".castle__end", { opacity: 1, duration: 0.05 }, 0.9)
       .from(".castle__bounty .ch", { yPercent: 80, opacity: 0, stagger: 0.004, duration: 0.05 }, 0.9)
       .call(() => SFX.play("gong"), [], 0.9)
-      .call(() => flash(0.5), [], 0.965)
       .to({}, { duration: 0.02 }, 0.98);
+
+    let castlePinned = true;
+    const syncCastlePin = () => {
+      const pin = castleTl.scrollTrigger;
+      if (!pin) return;
+      const shouldPin = $("#castle")?.dataset.static !== "true";
+      if (castlePinned === shouldPin) return;
+      castlePinned = shouldPin;
+      if (!shouldPin) pin.disable(true);
+      else pin.enable();
+      ScrollTrigger.refresh();
+    };
+    window.addEventListener("castle-layout", syncCastlePin);
+    syncCastlePin();
+    cleanups.push(() => window.removeEventListener("castle-layout", syncCastlePin));
 
     /* Keep the rider at the same castle progress across re-measures. A real
        resize (orientation change, window drag) re-measures the pin distance,
@@ -129,7 +134,7 @@ export function initDriver(): () => void {
     const onRefreshInit = () => {
       const st = castleTl.scrollTrigger;
       const y = window.scrollY;
-      rideProgress = st && y >= st.start && y <= st.end ? CASTLE.progress : null;
+      rideProgress = castlePinned && st && y >= st.start && y <= st.end ? CASTLE.progress : null;
     };
     const onRefresh = () => {
       const st = castleTl.scrollTrigger;

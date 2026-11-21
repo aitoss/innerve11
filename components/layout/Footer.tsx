@@ -24,7 +24,7 @@ export default function Footer() {
         <nav aria-label="Footer navigation" className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-paper/[.85]">
           <a href="#tracks" data-scroll className="py-1 hover:text-red">Tracks</a>
           <a href="#prizes" data-scroll className="py-1 hover:text-red">Prizes</a>
-          <a href="#timeline" data-scroll className="py-1 hover:text-red">Timeline</a>
+          <a href="#castle" data-scroll className="py-1 hover:text-red">Timeline</a>
           <a href="#faq" data-scroll className="py-1 hover:text-red">FAQ</a>
         </nav>
       </div>
