@@ -8,7 +8,10 @@ const CONTACTS = [
 
 export default function Footer() {
   return (
-    <footer className="foot foot-ichimatsu relative grid grid-cols-[2fr_1fr_1fr] gap-10 border-t border-paper/15 bg-ink px-gut pb-7 pt-[70px] max-[960px]:grid-cols-2 max-[640px]:gap-x-4 max-[640px]:gap-y-8 max-[420px]:grid-cols-1">
+    <footer
+      data-tone="dark"
+      className="foot foot-ichimatsu relative grid grid-cols-[2fr_1fr_1fr] gap-10 border-t border-paper/15 bg-ink px-gut pb-7 pt-[70px] max-[960px]:grid-cols-2 max-[640px]:gap-x-4 max-[640px]:gap-y-8 max-[420px]:grid-cols-1"
+    >
       <div className="foot__brand max-[960px]:col-span-full">
         <div className="foot__word font-display leading-[0.9] text-[clamp(48px,7vw,100px)]">
           INNERVE <b className="font-normal text-red">11</b>

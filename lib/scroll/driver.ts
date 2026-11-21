@@ -69,7 +69,7 @@ export function initDriver(): () => void {
   const ctx = gsap.context(() => {
     gsap.registerPlugin(ScrollTrigger);
     ScrollTrigger.config({ ignoreMobileResize: true }); // mobile address-bar resizes were re-laying out the pinned castle mid-scroll
-    const SECTIONS = $$("main > section"); // grab before pinning wraps them in spacers
+    const SECTIONS = $$("main [data-tone]"); // grab before pinning wraps them in spacers
 
     // Smooth scroll
     const lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 1 });
@@ -229,7 +229,8 @@ export function initDriver(): () => void {
       scrollTrigger: { trigger: "#vgrid", start: "top 70%" },
     });
 
-    /* ----- tone per section (kept for any tone-dependent styling) ----- */
+    /* ----- particle tone per section ----- */
+    document.body.dataset.tone = SECTIONS[0]?.dataset.tone ?? "dark";
     SECTIONS.forEach((sec) => {
       const spacer = sec.parentElement?.classList.contains("pin-spacer")
         ? (sec.parentElement as HTMLElement)
@@ -243,7 +244,6 @@ export function initDriver(): () => void {
         },
       });
     });
-    document.body.dataset.tone = "dark";
 
     /* The hero owns the only entrance timeline (and its own watchdog). Here we
        just re-measure once things settle; scroll-driven timelines are never

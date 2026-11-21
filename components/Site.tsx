@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { initDriver } from "@/lib/scroll/driver";
 import BackToNight from "@/components/layout/BackToNight";
 import Footer from "@/components/layout/Footer";
+import ParticleOverlay from "@/components/layout/ParticleOverlay";
 import InfinityCastle from "@/components/sections/castle/InfinityCastle";
 import Faq from "@/components/sections/faq/Faq";
 import RengokuHero from "@/components/sections/hero/RengokuHero";
@@ -36,6 +37,7 @@ export default function Site() {
         <Footer />
       </main>
 
+      <ParticleOverlay />
       <BackToNight />
     </>
   );
