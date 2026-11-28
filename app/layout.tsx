@@ -27,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href={FONT_URL} rel="stylesheet" />
         {children}
+        <script defer src="https://apply.devfolio.co/v2/sdk.js"></script>
       </body>
     </html>
   );
