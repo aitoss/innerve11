@@ -41,7 +41,7 @@ export default function Site() {
           ]}
         />
         <Sponsors />
-        <CrowFlyby text="CAW! No registration fee. Teams of 2 to 4!" dir="rtl" band={0.15} />
+        <CrowFlyby text="CAW! No registration fee. Teams of 4 members only." dir="rtl" band={0.15} />
         <Faq />
         <Footer />
       </main>
