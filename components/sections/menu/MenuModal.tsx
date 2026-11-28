@@ -155,7 +155,7 @@ interface MenuModalProps {
 export default function MenuModal({
   isOpen,
   onClose,
-  brochureUrl = "https://drive.google.com/file/d/1kcBuw6igb2xDGS1xgk9HivU-EvKXRS6D/view",
+  brochureUrl = "https://drive.google.com/file/d/1n9jZB292vtvmzalmzUfWMRTLrL6opSuO/view",
 }: MenuModalProps) {
   const [mounted, setMounted] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
