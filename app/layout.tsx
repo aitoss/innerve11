@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-
+import Script from "next/script";
 export const metadata: Metadata = {
   title: "Innerve 11",
   description:
@@ -27,6 +27,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href={FONT_URL} rel="stylesheet" />
         {children}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-C9RLSHB45B"
+          strategy="afterInteractive"
+        />
+
+        {/* Initialize GA */}
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-C9RLSHB45B');
+          `}
+        </Script>
         <script defer src="https://apply.devfolio.co/v2/sdk.js"></script>
       </body>
     </html>
