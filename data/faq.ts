@@ -35,7 +35,7 @@ export const faq: Record<FaqCategory, FaqItem[]> = {
     },
     {
       q: "Is there a minimum or maximum size for the team?",
-      a: "Yes, minimum 2 and maximum 4 participants are allowed per team.",
+      a: "Yes, fixed 4 members per team. No more, no less.",
     },
     {
       q: "What are the dates of Phase 1 & 2?",
