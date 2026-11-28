@@ -13,7 +13,7 @@ export const faq: Record<FaqCategory, FaqItem[]> = {
     },
     {
       q: "Who is eligible to participate?",
-      a: "Innerve 11 welcomes participants passionate about coding with keen interest in problem-solving, i.e., students, professionals, and hobbyists from diverse backgrounds.",
+      a: "Innerve 11 welcomes participants from under-graduate students.",
     },
     {
       q: "What are the different phases of the hackathon?",
